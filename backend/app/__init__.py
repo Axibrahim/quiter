@@ -7,9 +7,11 @@ and testing.
 """
 
 import os
+import sys
 import logging
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from app.models.models import db
 from app.security.headers import init_security_headers
@@ -21,6 +23,30 @@ from app.routes.squads import squads_bp
 
 def create_app(config_name: str = "production") -> Flask:
     app = Flask(__name__)
+
+    # Enable CORS for local development ports
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": ["http://localhost:8080", "http://127.0.0.1:8080", "http://localhost:5500", "http://127.0.0.1:5500"]}},
+        supports_credentials=True
+    )
+
+    # ------------------------------------------------------------------
+    # Logging Configuration
+    # ------------------------------------------------------------------
+    log_level = logging.DEBUG if config_name == "development" else logging.INFO
+
+    logging.basicConfig(
+        level=log_level,
+        format="[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)],
+        force=True,
+    )
+
+    app.logger.setLevel(log_level)
+    logging.getLogger("werkzeug").setLevel(log_level)
+
+    app.logger.info(f"Starting Quiter API in {config_name.upper()} mode")
 
     # ------------------------------------------------------------------
     # Core configuration
@@ -54,7 +80,6 @@ def create_app(config_name: str = "production") -> Flask:
     # ------------------------------------------------------------------
     # Production security checks
     # ------------------------------------------------------------------
-    
 
     if config_name == "production" and app.config["SECRET_KEY"] in (
         None,
@@ -71,7 +96,6 @@ def create_app(config_name: str = "production") -> Flask:
             "Set REDIS_URL so rate limits are shared across all workers."
         )
 
-
     # ------------------------------------------------------------------
     # Extensions
     # ------------------------------------------------------------------
@@ -86,6 +110,17 @@ def create_app(config_name: str = "production") -> Flask:
     limiter.init_app(app)
 
     init_security_headers(app, force_https=(config_name == "production"))
+
+    # ------------------------------------------------------------------
+    # Request & Response Logging Hook
+    # ------------------------------------------------------------------
+
+    @app.after_request
+    def log_response(response):
+        app.logger.info(
+            f"{request.remote_addr} - \"{request.method} {request.path} {request.environ.get('SERVER_PROTOCOL')}\" {response.status_code}"
+        )
+        return response
 
     # ------------------------------------------------------------------
     # Blueprints
@@ -127,12 +162,14 @@ def create_app(config_name: str = "production") -> Flask:
 
     @app.errorhandler(404)
     def not_found(e):
+        app.logger.warning(f"404 Not Found: {request.method} {request.path}")
         return jsonify({
             "error": "not_found"
         }), 404
 
     @app.errorhandler(429)
     def rate_limited(e):
+        app.logger.warning(f"429 Rate Limited: {request.remote_addr} on {request.path}")
         return jsonify({
             "error": "rate_limited",
             "detail": str(e.description),

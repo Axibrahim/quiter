@@ -7,7 +7,7 @@
  *   - uniform error handling   -> callers always get a clean Error with
  *     the backend's error code as the message, never a raw Response object
  */
-const API_BASE = '/api/v1';
+const API_BASE ='http://127.0.0.1:5000/api/v1';
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {

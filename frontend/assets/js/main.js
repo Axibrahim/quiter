@@ -1247,116 +1247,85 @@ function initAuth() {
 
 
   /* -----------------------------------------------------------------------
-     Submit login / signup
-     ----------------------------------------------------------------------- */
+   Submit login / signup
+   ----------------------------------------------------------------------- */
 
-  form.addEventListener(
-    'submit',
-    async (event) => {
-      event.preventDefault();
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-      if (errorElement) {
-        errorElement.textContent = '';
-      }
+  if (errorElement) {
+    errorElement.textContent = '';
+  }
 
-      submitButton.disabled = true;
+  submitButton.disabled = true;
 
-      const email =
-        emailInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-      const password =
-        passwordInput.value;
+  const payload = {
+    email,
+    password,
+  };
 
-      const payload = {
-        email,
-        password
-      };
+  if (mode === 'signup') {
+    payload.display_name = displayNameInput.value.trim();
+  }
 
-      if (mode === 'signup') {
-        payload.display_name =
-          displayNameInput.value.trim();
-      }
+  const API_BASE = 'http://127.0.0.1:5000';
+  const endpoint =
+    mode === 'signup'
+      ? `${API_BASE}/api/v1/auth/register`
+      : `${API_BASE}/api/v1/auth/login`;
 
-      const endpoint =
-        mode === 'signup'
-          ? '/api/v1/auth/register'
-          : '/api/v1/auth/login';
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Quiter-Client': 'web',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
 
-      try {
-        const response =
-          await fetch(
-            endpoint,
-            {
-              method: 'POST',
+    let result = {};
 
-              headers: {
-                'Content-Type':
-                  'application/json',
-
-                'Accept':
-                  'application/json'
-              },
-
-              credentials: 'include',
-
-              body:
-                JSON.stringify(
-                  payload
-                )
-            }
-          );
-
-        let result = {};
-
-        try {
-          result =
-            await response.json();
-        } catch {
-          result = {};
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            getAuthErrorMessage(
-              result
-            )
-          );
-        }
-
-        announce(
-          mode === 'signup'
-            ? 'Account created successfully.'
-            : 'Logged in successfully.'
-        );
-
-        closeAuth();
-
-        /*
-         * Flask has now created the authenticated
-         * session. Reload the page so the server
-         * can render the authenticated state.
-         */
-
-        window.location.reload();
-
-      } catch (error) {
-        console.error(
-          '[auth failed]',
-          error
-        );
-
-        if (errorElement) {
-          errorElement.textContent =
-            error.message ||
-            'Something went wrong.';
-        }
-
-      } finally {
-        submitButton.disabled =
-          false;
-      }
+    try {
+      result = await response.json();
+    } catch {
+      result = {};
     }
-  );
+
+    if (!response.ok) {
+      throw new Error(getAuthErrorMessage(result));
+    }
+
+    announce(
+      mode === 'signup'
+        ? 'Account created successfully.'
+        : 'Logged in successfully.'
+    );
+
+    closeAuth();
+
+    /*
+     * Flask has now created the authenticated
+     * session. Reload the page so the server
+     * can render the authenticated state.
+     */
+    window.location.reload();
+  } catch (error) {
+    console.error('[auth failed]', error);
+
+    if (errorElement) {
+      errorElement.textContent =
+        error.message || 'Something went wrong.';
+    }
+  } finally {
+    submitButton.disabled = false;
+  }
+});
 }
 
 
@@ -1419,7 +1388,7 @@ document.addEventListener(
        --------------------------------------------------------------------- */
 
     try {
-  initHeroVideoCrossfade();
+  initHeroVideo();
 } catch (e) {
   console.error(
     '[hero video init failed]',
