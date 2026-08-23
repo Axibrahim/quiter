@@ -1,0 +1,204 @@
+/* =========================================================================
+   QUITER — DESIGN TOKENS
+   Aesthetic: "Liquid Glass" (iOS 26 language) — near-invisible glass fill,
+   a thin light-catching gradient hairline border, and a soft inset top
+   highlight, all on a true-black canvas. Instrument Serif carries every
+   emotional/identity-driven line of copy in italic; Inter carries UI/body
+   text; JetBrains Mono carries numeric data (streaks, stats).
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* --- Color --- */
+  --bg: #000000;
+  --ink: #ffffff;
+  --ink-70: rgba(255, 255, 255, 0.7);
+  --ink-50: rgba(255, 255, 255, 0.5);
+  --ink-40: rgba(255, 255, 255, 0.4);
+
+  /* Direction accents — used sparingly, only where a plan's "break" vs
+     "build" identity needs to read at a glance (badges, glyph glow). Every
+     other surface in the system stays neutral white-on-black glass. */
+  --accent-ember: #ff6b4a;   /* break habits — smoking, alcohol, doomscrolling */
+  --accent-teal: #3fe8c9;    /* build habits — fitness, mindfulness */
+  --accent-violet: #8d7cff;  /* brand / primary CTA */
+
+  /* --- Type --- */
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* --- Layout rhythm --- */
+  --radius-full: 999px;
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: 7rem;
+  --max-width: 1200px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Reset --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+img, video { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+input { font: inherit; color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* =========================================================================
+   TYPOGRAPHY
+   ========================================================================= */
+
+em, .serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+h1, .h1 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(2.75rem, 8vw, 6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+h2, .h2 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+h3, .h3 { font-size: clamp(1.3rem, 2vw, 1.6rem); font-weight: 600; letter-spacing: -0.01em; }
+
+p { color: var(--ink-50); max-width: 60ch; }
+.lede { font-size: clamp(1rem, 1.5vw, 1.15rem); color: var(--ink); line-height: 1.6; }
+
+.stat-figure { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* =========================================================================
+   LIQUID GLASS SYSTEM
+   Exact recipe: near-transparent fill + backdrop blur + a gradient
+   hairline border built from a masked ::before pseudo-element (not a
+   regular CSS border, which can't do a directional light-catch gradient)
+   + a soft inset top highlight for that "wet glass" catch-light.
+   ========================================================================= */
+
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Larger content surfaces (dashboard cards, plan card faces, squad panel)
+   need a touch more fill than the spec's 0.01 — otherwise they read as
+   invisible against a plain black page section with no video behind them.
+   Same border/highlight recipe, just slightly more body. */
+.liquid-glass--panel {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: transform 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+.btn:active { transform: scale(0.96); }
+
+.btn--glass { color: var(--ink); }
+.btn--glass:hover { background: rgba(255, 255, 255, 0.06); }
+
+.btn--solid {
+  background: var(--ink);
+  color: #000;
+  font-weight: 600;
+}
+.btn--solid:hover { background: rgba(255, 255, 255, 0.85); }
+
+.btn--text { color: var(--ink-70); padding: 0.8rem 0.5rem; }
+.btn--text:hover { color: var(--ink); }
+
+.icon-btn {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-70);
+  transition: color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+.icon-btn:hover { color: var(--ink); background: rgba(255, 255, 255, 0.06); }

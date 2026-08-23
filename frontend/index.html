@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Quiter — Become who you're trying to be</title>
+  <meta name="description" content="Structured 7, 15, and 30-day identity plans to break bad habits and build good ones — with anonymous squads to keep you honest." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+</head>
+<body>
+
+  <!-- Transient WebGL layer for the check-in bloom reward — invisible
+       until triggered, sits above the whole page. -->
+  <canvas id="bloom-canvas" aria-hidden="true"></canvas>
+
+  <!-- ============================= HERO ============================= -->
+  <section class="hero">
+    <video
+      id="hero-video"
+      class="hero__video"
+      src="assets/media/glass-flower.mp4"
+      muted autoplay playsinline preload="auto"
+      aria-hidden="true"
+    ></video>
+
+    <header class="nav">
+      <div class="liquid-glass nav__pill">
+        <div class="nav__left">
+          <a href="#top" class="nav__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18M3 12h18"/></svg>
+            Quiter
+          </a>
+          <nav class="nav__links">
+            <a href="#plans">Plans</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#squads">Squads</a>
+          </nav>
+        </div>
+        <div class="nav__right">
+          <button class="btn btn--text" id="signup-trigger" type="button" data-open-auth="signup">Sign Up</button>
+          <button class="liquid-glass btn btn--glass" id="login-trigger" type="button" data-open-auth="login">Login</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="hero__content" id="top">
+      <h1 class="hero__title">Stop performing willpower.<br>Start <em>becoming</em>.</h1>
+
+      <form class="liquid-glass hero__goal-form" id="goal-form">
+        <input
+          class="hero__goal-input"
+          type="text"
+          id="goal-input"
+          placeholder="What are you trying to quit or build?"
+          autocomplete="off"
+        />
+        <button class="hero__goal-submit" type="submit" aria-label="Find your plan">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <p class="hero__subtitle lede">
+        Structured 7, 15, and 30-day identity plans — with an anonymous squad
+        that notices the moment you go quiet.
+      </p>
+
+      <a href="#how-it-works" class="liquid-glass btn btn--glass hero__how-it-works">How it works</a>
+    </div>
+  </section>
+
+  <main>
+
+    <!-- ============================= ABOUT ============================= -->
+    <section class="section section--glow wrap about" id="about">
+      <p class="eyebrow" data-reveal>Why Quiter</p>
+      <h2 class="h2 about__heading" data-reveal>
+        Identity <em class="serif-italic">change,</em><br>
+        not <em class="serif-italic">willpower</em> alone.
+      </h2>
+    </section>
+
+    <!-- ============================= HOW IT WORKS ============================= -->
+    <section class="section wrap" id="how-it-works">
+      <p class="eyebrow" data-reveal>How it works</p>
+      <h2 class="h2" data-reveal>Three small things, every day</h2>
+      <div class="steps-grid">
+        <div class="liquid-glass liquid-glass--panel step-card" data-reveal>
+          <p class="step-card__index">01</p>
+          <h3 class="step-card__title">Choose your identity</h3>
+          <p class="step-card__body">Pick a direction — break something, or build something — and Quiter maps it to a 7, 15, or 30-day plan.</p>
+        </div>
+        <div class="liquid-glass liquid-glass--panel step-card" data-reveal>
+          <p class="step-card__index">02</p>
+          <h3 class="step-card__title">One micro-goal a day</h3>
+          <p class="step-card__body">Each day maps to a small, winnable action — not a giant resolution you'll abandon by Thursday.</p>
+        </div>
+        <div class="liquid-glass liquid-glass--panel step-card" data-reveal>
+          <p class="step-card__index">03</p>
+          <h3 class="step-card__title">A squad that notices</h3>
+          <p class="step-card__body">10–20 anonymous people, consistency leaderboards, and a 1-tap Relapse Shield when it gets hard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================= PHILOSOPHY: BREAK x BUILD ============================= -->
+    <section class="section wrap" id="philosophy">
+      <h2 class="h2 philosophy__heading" data-reveal>Break <em class="serif-italic">x</em> Build</h2>
+      <div class="philosophy-grid">
+        <div class="liquid-glass liquid-glass--panel philosophy__visual" data-reveal aria-hidden="true">🌸</div>
+        <div data-reveal>
+          <div class="philosophy__block">
+            <p class="philosophy__label">Breaking a habit</p>
+            <p class="philosophy__body">Every craving you ride out — instead of feeding — is proof you're not who you used to be. We break the habit down into dozens of small, winnable moments instead of one long test of willpower.</p>
+          </div>
+          <div class="philosophy__block">
+            <p class="philosophy__label">Building a habit</p>
+            <p class="philosophy__body">Showing up for five minutes, every day, until moving your body or sitting still stops being a decision and starts being who you are.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================= SERVICES ============================= -->
+    <section class="section wrap" id="services">
+      <div class="services__head">
+        <h2 class="h2" data-reveal>What Quiter gives you</h2>
+        <p class="eyebrow" data-reveal>Two ways to change</p>
+      </div>
+      <div class="services-grid">
+        <a href="#plans" class="liquid-glass liquid-glass--panel service-card" data-reveal>
+          <div class="service-card__top-row">
+            <span class="service-card__glyph" aria-hidden="true">🌱</span>
+            <span class="icon-btn liquid-glass" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            </span>
+          </div>
+          <p class="service-card__tag">Structure</p>
+          <h3 class="service-card__title">Identity Plans</h3>
+          <p class="service-card__body">7, 15, and 30-day plans that map daily micro-goals to who you're becoming — not just what you're quitting.</p>
+        </a>
+        <a href="#squads" class="liquid-glass liquid-glass--panel service-card" data-reveal>
+          <div class="service-card__top-row">
+            <span class="service-card__glyph" aria-hidden="true">🫂</span>
+            <span class="icon-btn liquid-glass" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            </span>
+          </div>
+          <p class="service-card__tag">Accountability</p>
+          <h3 class="service-card__title">Anonymous Squads</h3>
+          <p class="service-card__body">10–20 people, consistency leaderboards, 1-tap nudges, and a Relapse Shield alert your squad can respond to in real time.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- ============================= PLANS (functional) ============================= -->
+    <section class="section wrap" id="plans">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow" data-reveal>Choose your identity</p>
+          <h2 class="h2" data-reveal>Every plan maps to who you're becoming</h2>
+        </div>
+        <p data-reveal>Tap a card to read the full identity statement and motivation.</p>
+      </div>
+
+      <div class="plan-grid" id="plan-grid">
+        <div class="liquid-glass liquid-glass--panel plan-card" data-reveal data-template-slug="smoke-free">
+          <div class="plan-card__photo" style="--plan-glow: rgba(255,107,74,0.35);" aria-hidden="true">🚬</div>
+          <div class="plan-card__body">
+            <span class="plan-card__direction plan-card__direction--break">Break · Smoking</span>
+            <h3 class="plan-card__title">Becoming Smoke-Free</h3>
+            <p class="plan-card__identity">"I am someone whose lungs are their own again."</p>
+            <div class="plan-card__meta"><span>30 days</span><span>4,812 active</span></div>
+            <button class="liquid-glass btn btn--glass plan-card__choose" data-choose-plan type="button">Choose this plan</button>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel plan-card" data-reveal data-template-slug="sober">
+          <div class="plan-card__photo" style="--plan-glow: rgba(255,107,74,0.35);" aria-hidden="true">🍷</div>
+          <div class="plan-card__body">
+            <span class="plan-card__direction plan-card__direction--break">Break · Alcohol</span>
+            <h3 class="plan-card__title">Becoming Sober</h3>
+            <p class="plan-card__identity">"I am someone who doesn't need it to feel okay."</p>
+            <div class="plan-card__meta"><span>30 days</span><span>3,190 active</span></div>
+            <button class="liquid-glass btn btn--glass plan-card__choose" data-choose-plan type="button">Choose this plan</button>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel plan-card" data-reveal data-template-slug="athlete">
+          <div class="plan-card__photo" style="--plan-glow: rgba(63,232,201,0.35);" aria-hidden="true">🏃</div>
+          <div class="plan-card__body">
+            <span class="plan-card__direction plan-card__direction--build">Build · Fitness</span>
+            <h3 class="plan-card__title">Becoming an Athlete</h3>
+            <p class="plan-card__identity">"I am someone who moves every day, no matter what."</p>
+            <div class="plan-card__meta"><span>15 days</span><span>6,004 active</span></div>
+            <button class="liquid-glass btn btn--glass plan-card__choose" data-choose-plan type="button">Choose this plan</button>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel plan-card plan-card--custom" data-reveal id="custom-plan-cta" tabindex="0" role="button">
+          <span class="plan-card__glyph" aria-hidden="true">✨</span>
+          <h3 class="plan-card__title">Build your own</h3>
+          <p class="plan-card__identity" style="max-width: 22ch;">Not on the list? Describe your own goal and we'll build a plan around it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================= DASHBOARD (functional) ============================= -->
+    <section class="section wrap" id="dashboard">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow" data-reveal>Today</p>
+          <h2 class="h2" data-reveal>Your identity, one check-in at a time</h2>
+        </div>
+      </div>
+
+      <div class="bento">
+        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--today" data-reveal>
+          <div class="today-card">
+            <div>
+              <p class="today-card__day">Day 12 of 30 — Becoming Smoke-Free</p>
+              <h3 class="today-card__goal">Delay your first cigarette urge by 20 minutes today.</h3>
+              <p class="today-card__cue">Smoke-free people ride the urge out — they don't negotiate with it.</p>
+            </div>
+            <div class="today-card__actions">
+              <button class="btn btn--solid" id="checkin-complete" type="button">Mark complete</button>
+              <button class="liquid-glass btn btn--glass" id="checkin-missed" type="button">I slipped today</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--streak" data-reveal>
+          <div class="stat-card">
+            <span class="stat-figure" id="streak-figure">11</span>
+            <span class="stat-label">day current streak</span>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--identity" data-reveal>
+          <div class="stat-card">
+            <span class="stat-figure" id="longest-figure">14</span>
+            <span class="stat-label">longest streak so far</span>
+          </div>
+        </div>
+
+        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--week" data-reveal>
+          <div class="week-strip" id="week-strip">
+            <div class="week-dot week-dot--done">M</div>
+            <div class="week-dot week-dot--done">T</div>
+            <div class="week-dot week-dot--done">W</div>
+            <div class="week-dot week-dot--missed">T</div>
+            <div class="week-dot week-dot--done">F</div>
+            <div class="week-dot week-dot--done">S</div>
+            <div class="week-dot week-dot--today">S</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================= SQUADS (functional) ============================= -->
+    <section class="section wrap" id="squads">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow" data-reveal>Anonymous accountability</p>
+          <h2 class="h2" data-reveal>A squad that notices when you go quiet</h2>
+        </div>
+        <p data-reveal>No usernames tied to your real identity — just consistency, nudges, and a Relapse Shield your squad can respond to in real time.</p>
+      </div>
+
+      <div class="liquid-glass liquid-glass--panel squad-panel" data-reveal>
+        <div class="squad-ring" id="squad-ring" aria-hidden="true">
+          <div class="squad-ring__center liquid-glass">You</div>
+        </div>
+        <div>
+          <h3 class="h3" style="margin-bottom: 0.75rem;">Sober Sprinters #14</h3>
+          <p style="margin-bottom: 1rem;">14 members · 89% average consistency this week</p>
+          <div class="nudge-row">
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="stay_strong" type="button">Stay Strong 💪</button>
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="breathe" type="button">Breathe 🌬️</button>
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="proud_of_you" type="button">Proud of you 🌸</button>
+            <button class="liquid-glass btn btn--glass nudge-btn nudge-btn--shield" data-nudge="relapse_shield" type="button">⚠ Relapse Shield</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer wrap">
+    <span>© 2026 Quiter. Built to be quit — one habit at a time.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+
+  <!-- ============================= AUTH MODAL ============================= -->
+  <div class="modal-overlay" id="auth-modal-overlay">
+    <div class="liquid-glass liquid-glass--panel modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+      <button class="icon-btn modal__close" id="auth-modal-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal__tabs">
+        <button class="modal__tab is-active" id="tab-login" type="button">Login</button>
+        <button class="modal__tab" id="tab-signup" type="button">Sign Up</button>
+      </div>
+      <h3 class="h3" id="auth-modal-title" style="margin-bottom: var(--space-2);">Welcome back</h3>
+
+      <form id="auth-form">
+        <div class="modal__field" id="field-display-name" style="display: none;">
+          <label for="auth-display-name">Display name</label>
+          <input type="text" id="auth-display-name" placeholder="How your squad sees you" autocomplete="nickname" />
+        </div>
+        <div class="modal__field">
+          <label for="auth-email">Email</label>
+          <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+        <div class="modal__field">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" placeholder="At least 10 characters" autocomplete="current-password" required />
+        </div>
+        <p class="modal__error" id="auth-error"></p>
+        <button class="btn btn--solid modal__submit" type="submit" id="auth-submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================= CUSTOM PLAN MODAL ============================= -->
+  <div class="modal-overlay" id="custom-modal-overlay">
+    <div class="liquid-glass liquid-glass--panel modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title">
+      <button class="icon-btn modal__close" id="custom-modal-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h3 class="h3" id="custom-modal-title" style="margin-bottom: var(--space-2);">Build your own plan</h3>
+
+      <form id="custom-plan-form">
+        <div class="modal__field">
+          <label for="custom-goal">What are you quitting or building?</label>
+          <textarea id="custom-goal" placeholder="e.g. checking my phone first thing every morning" required></textarea>
+        </div>
+        <div class="modal__field">
+          <label>Direction</label>
+          <div class="modal__radio-row">
+            <label><input type="radio" name="custom-direction" value="break" checked /><span>Break it</span></label>
+            <label><input type="radio" name="custom-direction" value="build" /><span>Build it</span></label>
+          </div>
+        </div>
+        <div class="modal__field">
+          <label for="custom-length">Plan length</label>
+          <select id="custom-length">
+            <option value="7">7 days</option>
+            <option value="15">15 days</option>
+            <option value="30" selected>30 days</option>
+          </select>
+        </div>
+        <p class="modal__error" id="custom-error"></p>
+        <button class="btn btn--solid modal__submit" type="submit">Create my plan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= Third-party libraries (pinned CDN) ================= -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
