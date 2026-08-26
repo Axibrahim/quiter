@@ -46,21 +46,31 @@
       </div>
     </header>
 
-    <div class="hero__content" id="top">
-      <h1 class="hero__title">Stop performing willpower.<br>Start <em>becoming</em>.</h1>
+        <div class="hero__content" id="top">
+      <h1 class="hero__title" id="hero-title" aria-label="Stop performing willpower. Start becoming.">
+        <span class="hero__title-line hero__title-line--1" id="typewriter-line-1">Stop performing willpower.</span><br>
+        <span class="hero__title-line hero__title-line--2">
+          <span class="hero__title-prefix">Start </span><span class="hero__title-dynamic" id="typewriter-text"><em>becoming</em>.</span><span class="typewriter-cursor" id="typewriter-cursor" aria-hidden="true"></span>
+        </span>
+      </h1>
 
-      <form class="liquid-glass hero__goal-form" id="goal-form">
-        <input
-          class="hero__goal-input"
-          type="text"
-          id="goal-input"
-          placeholder="What are you trying to quit or build?"
-          autocomplete="off"
-        />
-        <button class="hero__goal-submit" type="submit" aria-label="Find your plan">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-      </form>
+      <div class="hero__goal-container" id="goal-container">
+        <form class="liquid-glass hero__goal-form" id="goal-form">
+          <div class="hero__goal-track" id="goal-track">
+            <input
+              class="hero__goal-input"
+              type="text"
+              id="goal-input"
+              placeholder="What are you trying to quit or build?"
+              autocomplete="off"
+              aria-label="Search plans or enter a habit goal"
+            />
+            <button class="hero__goal-submit" id="goal-submit-btn" type="submit" aria-label="Find your plan">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
 
       <p class="hero__subtitle lede">
         Structured 7, 15, and 30-day identity plans — with an anonymous squad
