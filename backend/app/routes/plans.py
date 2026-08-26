@@ -19,11 +19,45 @@ from app.utils.validation import validate_uuid_param
 plans_bp = Blueprint("plans", __name__, url_prefix="/api/v1/plans")
 
 
-@plans_bp.route("/templates", methods=["GET"])
+@plans_bp.route("/mine", methods=["GET"])
 @login_required
+def my_plans():
+    """List the current user's plans for the dashboard — active ones first,
+    each with today's micro-goal pre-computed so the dashboard doesn't need
+    a second round trip per plan."""
+    user_plans = UserPlan.query.filter_by(user_id=g.current_user.id).order_by(UserPlan.created_at.desc()).all()
+
+    out = []
+    for up in user_plans:
+        day_number = max(1, min((date.today() - up.start_date).days + 1, up.template.length_days))
+        plan_day = PlanDay.query.filter_by(template_id=up.template_id, day_number=day_number).first()
+        already_logged = DailyLog.query.filter_by(user_plan_id=up.id, log_date=date.today()).first()
+        out.append({
+            "user_plan_id": up.id,
+            "title": up.template.title,
+            "identity_statement": up.template.identity_statement,
+            "direction": up.template.direction.value,
+            "day_number": day_number,
+            "total_days": up.template.length_days,
+            "current_streak": up.current_streak,
+            "longest_streak": up.longest_streak,
+            "is_completed": up.is_completed,
+            "is_abandoned": up.is_abandoned,
+            "micro_goal": plan_day.micro_goal if plan_day else None,
+            "identity_cue": plan_day.identity_cue if plan_day else None,
+            "already_logged_today": already_logged is not None,
+        })
+    return jsonify(out), 200
+
+
+@plans_bp.route("/templates", methods=["GET"])
 def list_templates():
-    """Browse the identity-plan catalog. Supports ?direction=break|build and
-    ?length=7|15|30 filters — both validated against the Enum, so an
+    """Browse the identity-plan catalog. Deliberately PUBLIC (no
+    @login_required) — the whole point of the landing page's plan cards is
+    to let a logged-out visitor browse before they ever create an account.
+    Nothing in this response is user-specific or sensitive. Supports
+    ?direction=break|build and ?length=7|15|30 filters — both validated
+    against the Enum, so an arbitrary query string can never reach raw SQL.
     arbitrary query string can never reach raw SQL."""
     direction = request.args.get("direction")
     length = request.args.get("length", type=int)
@@ -83,6 +117,9 @@ def get_today(user_plan_id):
     if not validate_uuid_param(user_plan_id):
         return jsonify({"error": "invalid_id"}), 400
 
+    # Scoped by BOTH id and user_id in the same filter — this is the IDOR
+    # guard. A user supplying someone else's user_plan_id simply gets a 404,
+    # never another user's data.
     user_plan = UserPlan.query.filter_by(id=user_plan_id, user_id=g.current_user.id).first()
     if user_plan is None:
         return jsonify({"error": "plan_not_found"}), 404
@@ -150,6 +187,9 @@ def checkin(user_plan_id):
         if day_number >= user_plan.template.length_days:
             user_plan.is_completed = True
     else:
+        # Missed or relapsed day breaks the streak but does NOT end the
+        # plan — Quiter's whole design thesis is "the plan survives a slip",
+        # which is deliberately reflected here at the data layer.
         user_plan.current_streak = 0
 
     db.session.commit()
@@ -194,10 +234,10 @@ def create_custom_plan():
         category="custom",
         length_days=length_days,
         description="A custom plan built by the user.",
-        is_active=False,
+        is_active=False,  # hidden from the public catalog — personal to this plan instance
     )
     db.session.add(template)
-    db.session.flush()
+    db.session.flush()  # assigns template.id without committing yet
 
     for day_number in range(1, length_days + 1):
         db.session.add(PlanDay(

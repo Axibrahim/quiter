@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Your Dashboard — Quiter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+</head>
+<body style="background: var(--bg);">
+
+  <canvas id="bloom-canvas" aria-hidden="true"></canvas>
+
+  <header class="nav wrap" style="position: sticky; top: 0;">
+    <div class="liquid-glass nav__pill">
+      <div class="nav__left">
+        <a href="index.html" class="nav__mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18M3 12h18"/></svg>
+          Quiter
+        </a>
+        <nav class="nav__links">
+          <a href="index.html#plans">Plans</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+      <div class="nav__right" id="nav-auth-slot"></div>
+    </div>
+  </header>
+
+  <main class="wrap section" style="padding-top: var(--space-3);">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow">Today</p>
+        <h1 class="h2">Your identity, one check-in at a time</h1>
+      </div>
+      <button class="liquid-glass btn btn--glass" id="open-custom-plan" type="button">+ Build a custom plan</button>
+    </div>
+
+    <div id="plans-loading" class="lede">Loading your plans…</div>
+    <div id="plans-empty" style="display:none;">
+      <p class="lede">You haven't started a plan yet.</p>
+      <a href="index.html#plans" class="liquid-glass btn btn--solid" style="margin-top: var(--space-2);">Browse plans</a>
+    </div>
+
+    <div id="plans-list" style="display: flex; flex-direction: column; gap: var(--space-3);"></div>
+
+    <!-- ============================= SQUAD (static preview — real squad
+         membership/joining flow is a follow-up backend feature) ============================= -->
+    <section class="section" id="squads">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Anonymous accountability</p>
+          <h2 class="h2">A squad that notices when you go quiet</h2>
+        </div>
+      </div>
+      <div class="liquid-glass liquid-glass--panel squad-panel">
+        <div class="squad-ring" aria-hidden="true">
+          <div class="squad-ring__center liquid-glass">You</div>
+        </div>
+        <div>
+          <h3 class="h3" style="margin-bottom: 0.75rem;">Sober Sprinters #14</h3>
+          <p style="margin-bottom: 1rem;">14 members · 89% average consistency this week</p>
+          <div class="nudge-row">
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="stay_strong" type="button">Stay Strong 💪</button>
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="breathe" type="button">Breathe 🌬️</button>
+            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="proud_of_you" type="button">Proud of you 🌸</button>
+            <button class="liquid-glass btn btn--glass nudge-btn nudge-btn--shield" data-nudge="relapse_shield" type="button">⚠ Relapse Shield</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <span>© 2026 Quiter. Built to be quit — one habit at a time.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+
+  <!-- ============================= CUSTOM PLAN MODAL ============================= -->
+  <div class="modal-overlay" id="custom-modal-overlay">
+    <div class="liquid-glass liquid-glass--panel modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title">
+      <button class="icon-btn modal__close" id="custom-modal-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h3 class="h3" id="custom-modal-title" style="margin-bottom: var(--space-2);">Build your own plan</h3>
+
+      <form id="custom-plan-form">
+        <div class="modal__field">
+          <label for="custom-goal">What are you quitting or building?</label>
+          <textarea id="custom-goal" placeholder="e.g. checking my phone first thing every morning" required></textarea>
+        </div>
+        <div class="modal__field">
+          <label>Direction</label>
+          <div class="modal__radio-row">
+            <label><input type="radio" name="custom-direction" value="break" checked /><span>Break it</span></label>
+            <label><input type="radio" name="custom-direction" value="build" /><span>Build it</span></label>
+          </div>
+        </div>
+        <div class="modal__field">
+          <label for="custom-length">Plan length</label>
+          <select id="custom-length">
+            <option value="7">7 days</option>
+            <option value="15">15 days</option>
+            <option value="30" selected>30 days</option>
+          </select>
+        </div>
+        <p class="modal__error" id="custom-error"></p>
+        <button class="btn btn--solid modal__submit" type="submit">Create my plan</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script type="module" src="assets/js/dashboard.js"></script>
+</body>
+</html>

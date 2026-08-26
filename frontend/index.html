@@ -36,13 +36,12 @@
           </a>
           <nav class="nav__links">
             <a href="#plans">Plans</a>
-            <a href="#dashboard">Dashboard</a>
-            <a href="#squads">Squads</a>
+            <a href="about.html">About</a>
           </nav>
         </div>
-        <div class="nav__right">
-          <button class="btn btn--text" id="signup-trigger" type="button" data-open-auth="signup">Sign Up</button>
-          <button class="liquid-glass btn btn--glass" id="login-trigger" type="button" data-open-auth="login">Login</button>
+        <div class="nav__right" id="nav-auth-slot">
+          <button class="btn btn--text" id="signup-trigger" type="button">Sign Up</button>
+          <button class="liquid-glass btn btn--glass" id="login-trigger" type="button">Login</button>
         </div>
       </div>
     </header>
@@ -74,13 +73,14 @@
 
   <main>
 
-    <!-- ============================= ABOUT ============================= -->
+    <!-- ============================= ABOUT (teaser) ============================= -->
     <section class="section section--glow wrap about" id="about">
       <p class="eyebrow" data-reveal>Why Quiter</p>
       <h2 class="h2 about__heading" data-reveal>
         Identity <em class="serif-italic">change,</em><br>
         not <em class="serif-italic">willpower</em> alone.
       </h2>
+      <a href="about.html" class="liquid-glass btn btn--glass" data-reveal style="margin-top: var(--space-3);">Read our full philosophy →</a>
     </section>
 
     <!-- ============================= HOW IT WORKS ============================= -->
@@ -102,24 +102,6 @@
           <p class="step-card__index">03</p>
           <h3 class="step-card__title">A squad that notices</h3>
           <p class="step-card__body">10–20 anonymous people, consistency leaderboards, and a 1-tap Relapse Shield when it gets hard.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================= PHILOSOPHY: BREAK x BUILD ============================= -->
-    <section class="section wrap" id="philosophy">
-      <h2 class="h2 philosophy__heading" data-reveal>Break <em class="serif-italic">x</em> Build</h2>
-      <div class="philosophy-grid">
-        <div class="liquid-glass liquid-glass--panel philosophy__visual" data-reveal aria-hidden="true">🌸</div>
-        <div data-reveal>
-          <div class="philosophy__block">
-            <p class="philosophy__label">Breaking a habit</p>
-            <p class="philosophy__body">Every craving you ride out — instead of feeding — is proof you're not who you used to be. We break the habit down into dozens of small, winnable moments instead of one long test of willpower.</p>
-          </div>
-          <div class="philosophy__block">
-            <p class="philosophy__label">Building a habit</p>
-            <p class="philosophy__body">Showing up for five minutes, every day, until moving your body or sitting still stops being a decision and starts being who you are.</p>
-          </div>
         </div>
       </div>
     </section>
@@ -200,92 +182,14 @@
           </div>
         </div>
 
-        <div class="liquid-glass liquid-glass--panel plan-card plan-card--custom" data-reveal id="custom-plan-cta" tabindex="0" role="button">
+        <a href="dashboard.html" class="liquid-glass liquid-glass--panel plan-card plan-card--custom" data-reveal id="custom-plan-cta">
           <span class="plan-card__glyph" aria-hidden="true">✨</span>
           <h3 class="plan-card__title">Build your own</h3>
-          <p class="plan-card__identity" style="max-width: 22ch;">Not on the list? Describe your own goal and we'll build a plan around it.</p>
-        </div>
+          <p class="plan-card__identity" style="max-width: 22ch;">Not on the list? Sign in and describe your own goal — we'll build a plan around it.</p>
+        </a>
       </div>
     </section>
 
-    <!-- ============================= DASHBOARD (functional) ============================= -->
-    <section class="section wrap" id="dashboard">
-      <div class="section__head">
-        <div>
-          <p class="eyebrow" data-reveal>Today</p>
-          <h2 class="h2" data-reveal>Your identity, one check-in at a time</h2>
-        </div>
-      </div>
-
-      <div class="bento">
-        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--today" data-reveal>
-          <div class="today-card">
-            <div>
-              <p class="today-card__day">Day 12 of 30 — Becoming Smoke-Free</p>
-              <h3 class="today-card__goal">Delay your first cigarette urge by 20 minutes today.</h3>
-              <p class="today-card__cue">Smoke-free people ride the urge out — they don't negotiate with it.</p>
-            </div>
-            <div class="today-card__actions">
-              <button class="btn btn--solid" id="checkin-complete" type="button">Mark complete</button>
-              <button class="liquid-glass btn btn--glass" id="checkin-missed" type="button">I slipped today</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--streak" data-reveal>
-          <div class="stat-card">
-            <span class="stat-figure" id="streak-figure">11</span>
-            <span class="stat-label">day current streak</span>
-          </div>
-        </div>
-
-        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--identity" data-reveal>
-          <div class="stat-card">
-            <span class="stat-figure" id="longest-figure">14</span>
-            <span class="stat-label">longest streak so far</span>
-          </div>
-        </div>
-
-        <div class="liquid-glass liquid-glass--panel bento-cell bento-cell--week" data-reveal>
-          <div class="week-strip" id="week-strip">
-            <div class="week-dot week-dot--done">M</div>
-            <div class="week-dot week-dot--done">T</div>
-            <div class="week-dot week-dot--done">W</div>
-            <div class="week-dot week-dot--missed">T</div>
-            <div class="week-dot week-dot--done">F</div>
-            <div class="week-dot week-dot--done">S</div>
-            <div class="week-dot week-dot--today">S</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================= SQUADS (functional) ============================= -->
-    <section class="section wrap" id="squads">
-      <div class="section__head">
-        <div>
-          <p class="eyebrow" data-reveal>Anonymous accountability</p>
-          <h2 class="h2" data-reveal>A squad that notices when you go quiet</h2>
-        </div>
-        <p data-reveal>No usernames tied to your real identity — just consistency, nudges, and a Relapse Shield your squad can respond to in real time.</p>
-      </div>
-
-      <div class="liquid-glass liquid-glass--panel squad-panel" data-reveal>
-        <div class="squad-ring" id="squad-ring" aria-hidden="true">
-          <div class="squad-ring__center liquid-glass">You</div>
-        </div>
-        <div>
-          <h3 class="h3" style="margin-bottom: 0.75rem;">Sober Sprinters #14</h3>
-          <p style="margin-bottom: 1rem;">14 members · 89% average consistency this week</p>
-          <div class="nudge-row">
-            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="stay_strong" type="button">Stay Strong 💪</button>
-            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="breathe" type="button">Breathe 🌬️</button>
-            <button class="liquid-glass btn btn--glass nudge-btn" data-nudge="proud_of_you" type="button">Proud of you 🌸</button>
-            <button class="liquid-glass btn btn--glass nudge-btn nudge-btn--shield" data-nudge="relapse_shield" type="button">⚠ Relapse Shield</button>
-          </div>
-        </div>
-      </div>
-    </section>
 
   </main>
 
@@ -318,43 +222,10 @@
         <div class="modal__field">
           <label for="auth-password">Password</label>
           <input type="password" id="auth-password" placeholder="At least 10 characters" autocomplete="current-password" required />
+          <a href="#" id="auth-forgot-link" style="display:block; text-align:right; font-size:0.8rem; color:var(--ink-40); margin-top:0.4rem;">Forgot password?</a>
         </div>
         <p class="modal__error" id="auth-error"></p>
         <button class="btn btn--solid modal__submit" type="submit" id="auth-submit">Login</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ============================= CUSTOM PLAN MODAL ============================= -->
-  <div class="modal-overlay" id="custom-modal-overlay">
-    <div class="liquid-glass liquid-glass--panel modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title">
-      <button class="icon-btn modal__close" id="custom-modal-close" type="button" aria-label="Close">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
-      <h3 class="h3" id="custom-modal-title" style="margin-bottom: var(--space-2);">Build your own plan</h3>
-
-      <form id="custom-plan-form">
-        <div class="modal__field">
-          <label for="custom-goal">What are you quitting or building?</label>
-          <textarea id="custom-goal" placeholder="e.g. checking my phone first thing every morning" required></textarea>
-        </div>
-        <div class="modal__field">
-          <label>Direction</label>
-          <div class="modal__radio-row">
-            <label><input type="radio" name="custom-direction" value="break" checked /><span>Break it</span></label>
-            <label><input type="radio" name="custom-direction" value="build" /><span>Build it</span></label>
-          </div>
-        </div>
-        <div class="modal__field">
-          <label for="custom-length">Plan length</label>
-          <select id="custom-length">
-            <option value="7">7 days</option>
-            <option value="15">15 days</option>
-            <option value="30" selected>30 days</option>
-          </select>
-        </div>
-        <p class="modal__error" id="custom-error"></p>
-        <button class="btn btn--solid modal__submit" type="submit">Create my plan</button>
       </form>
     </div>
   </div>

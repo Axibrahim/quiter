@@ -95,6 +95,14 @@ class User(db.Model):
     is_active = Column(Boolean, nullable=False, default=True)
     is_verified = Column(Boolean, nullable=False, default=False)
 
+    # Email verification (sent via Resend on registration).
+    verification_token = Column(String(64), nullable=True, index=True)
+    verification_token_expires_at = Column(DateTime, nullable=True)
+
+    # Password reset (sent via Resend on request).
+    reset_token = Column(String(64), nullable=True, index=True)
+    reset_token_expires_at = Column(DateTime, nullable=True)
+
     # Account lockout support (paired with Flask-Limiter) to blunt credential
     # stuffing even if an attacker rotates source IPs.
     failed_login_attempts = Column(Integer, nullable=False, default=0)

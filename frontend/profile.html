@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Your Profile — Quiter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+</head>
+<body style="background: var(--bg);">
+
+  <header class="nav wrap" style="position: sticky; top: 0;">
+    <div class="liquid-glass nav__pill">
+      <div class="nav__left">
+        <a href="index.html" class="nav__mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18M3 12h18"/></svg>
+          Quiter
+        </a>
+        <nav class="nav__links">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+      <div class="nav__right" id="nav-auth-slot"></div>
+    </div>
+  </header>
+
+  <main class="wrap section" style="max-width: 560px; padding-top: var(--space-3);">
+    <p class="eyebrow">Account</p>
+    <h1 class="h2" style="margin-bottom: var(--space-4);">Your profile</h1>
+
+    <div class="liquid-glass liquid-glass--panel" style="border-radius: var(--radius-lg); padding: var(--space-4);">
+      <div id="verify-banner" style="display:none; margin-bottom: var(--space-3); padding: var(--space-2); border-radius: var(--radius-md); background: rgba(255,107,74,0.12); color: var(--accent-ember); font-size: 0.88rem; display:flex; justify-content:space-between; align-items:center; gap: var(--space-2);">
+        <span>Your email isn't verified yet.</span>
+        <button class="liquid-glass btn btn--glass" id="resend-verify-btn" type="button" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">Resend</button>
+      </div>
+
+      <form id="profile-form">
+        <div class="modal__field">
+          <label for="profile-display-name">Display name</label>
+          <input type="text" id="profile-display-name" disabled style="opacity:0.6;" />
+          <p style="font-size:0.75rem; color: var(--ink-40); margin-top:0.3rem;">Display name changes aren't wired up yet — coming soon.</p>
+        </div>
+        <div class="modal__field">
+          <label for="profile-email">Email</label>
+          <input type="email" id="profile-email" autocomplete="email" required />
+        </div>
+        <div class="modal__field">
+          <label for="profile-new-password">New password <span style="color:var(--ink-40);">(leave blank to keep current)</span></label>
+          <input type="password" id="profile-new-password" placeholder="At least 10 characters" autocomplete="new-password" />
+        </div>
+        <div class="modal__field">
+          <label for="profile-current-password">Current password <span style="color:var(--accent-ember);">*required to save any change</span></label>
+          <input type="password" id="profile-current-password" autocomplete="current-password" required />
+        </div>
+        <p class="modal__error" id="profile-error"></p>
+        <p id="profile-success" style="color: var(--accent-teal); font-size: 0.85rem; margin-top: var(--space-1); min-height: 1.2em;"></p>
+        <button class="btn btn--solid modal__submit" type="submit">Save changes</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer wrap">
+    <span>© 2026 Quiter. Built to be quit — one habit at a time.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+
+  <script type="module" src="assets/js/profile.js"></script>
+</body>
+</html>
