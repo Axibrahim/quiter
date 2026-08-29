@@ -144,18 +144,50 @@ main,
   pointer-events: none;
 }
 
-/* --- Navbar --- */
+
+/* =========================================================================
+   PLANS PAGE BLOOM BACKDROP & SCROLL BLUR
+   ========================================================================= */
+
+.plans__backdrop-wrapper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.plans__bloom-photo {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  object-position: center 25%;
+  opacity: 0.72;
+  filter: blur(var(--plans-blur, 0px)) brightness(0.88) contrast(1.05);
+  transform: scale(calc(1 + var(--plans-scale, 0) * 0.06)) translateY(calc(var(--plans-parallax, 0px) * -0.15));
+  will-change: filter, transform;
+  transition: filter 0.15s linear;
+}
+
+
+/* =========================================================================
+   NAVBAR & OVERRIDES
+   ========================================================================= */
 
 .nav {
   position: relative;
   z-index: 20;
-  padding: var(--space-3) clamp(1.25rem, 4vw, 3rem);
+  padding: var(--space-3, 1rem) clamp(1.25rem, 4vw, 3rem);
 }
 
 .nav__pill {
   max-width: 960px;
   margin-inline: auto;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-full, 9999px);
   padding: 0.7rem 1.4rem;
 
   display: flex;
@@ -166,51 +198,58 @@ main,
 .nav__left {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 2rem;
 }
 
 .nav__mark {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
   font-weight: 600;
   font-size: 1.05rem;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
 }
 
 .nav__mark svg {
-  width: 22px;
-  height: 22px;
+  width: 22px !important;
+  height: 22px !important;
+  flex-shrink: 0 !important;
 }
 
 .nav__links {
-  display: none;
-  gap: var(--space-3);
-
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
   font-size: 0.88rem;
-  color: var(--ink-70);
-}
-
-@media (min-width: 860px) {
-  .nav__links {
-    display: flex;
-  }
 }
 
 .nav__links a {
-  transition:
-    color 250ms ease,
-    opacity 250ms ease;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 250ms ease;
 }
 
 .nav__links a:hover {
-  color: var(--ink);
+  opacity: 1;
 }
 
 .nav__right {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.75rem;
+}
+
+/* Prevent backdrop bloom blowout */
+.plans__backdrop-wrapper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -1619,3 +1658,53 @@ main,
     transform 0.6s ease;
 }
 
+/* Force backdrop wrappers to contain their overflowing background images */
+.plans__backdrop-wrapper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden !important;
+}
+
+.plans__bloom-photo {
+  max-width: none;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Guard nav logo against flex box expansion */
+.nav__mark {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav__mark svg {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+}
+
+/* Spacing layout for links + Dashboard */
+.nav__left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}

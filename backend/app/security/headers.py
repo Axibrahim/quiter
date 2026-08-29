@@ -51,7 +51,13 @@ def init_security_headers(app, force_https=True):
         strict_transport_security=force_https,
         strict_transport_security_max_age=31536000,   # 1 year, per HSTS preload requirements
         strict_transport_security_include_subdomains=True,
-        session_cookie_secure=True,       # cookie only sent over TLS
+        # Only require HTTPS for the cookie when we're actually serving
+        # over HTTPS (production). Hardcoding this True breaks every local
+        # dev login: the browser silently discards a Secure-flagged cookie
+        # on a plain http:// connection, so login POSTs return 200 but the
+        # session never actually persists — GET /auth/me immediately 401s
+        # again on the very next request.
+        session_cookie_secure=force_https,
         session_cookie_http_only=True,    # cookie invisible to JS — blocks XSS-driven session theft
         # SameSite=Lax stops cross-site POST-based CSRF from ever attaching
         # the session cookie, while still allowing normal top-level nav.
