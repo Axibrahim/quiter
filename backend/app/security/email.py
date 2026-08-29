@@ -17,6 +17,7 @@ endpoint (or the person just asking support) can still recover.
 """
 import os
 import logging
+from html import escape
 from datetime import datetime, timedelta
 
 import resend
@@ -30,24 +31,31 @@ _FROM_ADDRESS = os.environ.get("RESEND_FROM_ADDRESS", "Quiter <onboarding@resend
 _APP_BASE_URL = os.environ.get("APP_BASE_URL", "http://localhost:8080")
 
 
-def _send(to_email: str, subject: str, html: str) -> None:
+def _send(to_email: str, subject: str, html: str) -> bool:
     api_key = os.environ.get("RESEND_API_KEY")
-    if not api_key:
-        logger.warning("RESEND_API_KEY not set — skipping email send (dev mode). Subject: %s", subject)
-        return
-    resend.api_key = api_key
-    try:
-        resend.Emails.send({
-            "from": _FROM_ADDRESS,
-            "to": [to_email],
-            "subject": subject,
-            "html": html,
-        })
-    except Exception:
-        # Never let an email-provider outage break the auth flow that
-        # triggered it — log loudly, degrade gracefully.
-        logger.exception("Resend send failed for %s", to_email)
 
+    if not api_key:
+        logger.warning(
+            "RESEND_API_KEY not set — skipping email send. Subject: %s",
+            subject,
+        )
+        return False
+
+    resend.api_key = api_key
+
+    try:
+        resend.Emails.send(
+            {
+                "from": _FROM_ADDRESS,
+                "to": [to_email],
+                "subject": subject,
+                "html": html,
+            }
+        )
+        return True
+    except Exception:
+        logger.exception("Resend send failed for %s", to_email)
+        return False
 
 def send_verification_email(email: str, display_name: str, token: str) -> None:
     link = f"{_APP_BASE_URL}/verify.html?token={token}"

@@ -97,8 +97,8 @@ function renderPlanCard(template) {
       <p class="plan-card__identity">"${escapeHtml(template.identity_statement)}"</p>
       <div class="plan-card__meta">
         <span>${template.length_days} days</span>
-        <span>${template.active_count || 'Active squad'}</span>
-      </div>
+        <span>${template.active_count || 'Active now'}</span>
+        </div>
       <button class="liquid-glass btn btn--glass plan-card__choose" data-adopt-btn type="button">Choose this plan</button>
     </div>
   `;
@@ -115,7 +115,7 @@ function renderCustomPlanCard() {
   card.innerHTML = `
     <span class="plan-card__glyph" aria-hidden="true">✨</span>
     <h3 class="plan-card__title">Build your own</h3>
-    <p class="plan-card__identity" style="max-width: 22ch;">Not on the list? Describe your own goal and we'll craft an identity squad plan around it.</p>
+    <p class="plan-card__identity" style="max-width: 22ch;">Not on the list? Describe your own goal and we'll craft an identity plan around it.</p>
   `;
   return card;
 }

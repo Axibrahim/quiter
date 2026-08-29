@@ -94,80 +94,157 @@ function initCustomPlanModal() {
   const closeBtn = document.getElementById('custom-modal-close');
   const form = document.getElementById('custom-plan-form');
   const errorEl = document.getElementById('custom-error');
+  const goalInput = document.getElementById('custom-goal');
+  const goalCount = document.getElementById('custom-goal-count');
+  const lengthInput = document.getElementById('custom-length');
+  const lengthOutput = document.getElementById('custom-length-output');
+  const identityInput = document.getElementById('custom-identity');
+
   if (!overlay || !form) return;
 
-  const open = () => { overlay.classList.add('is-open'); document.body.style.overflow = 'hidden'; };
-  const close = () => { overlay.classList.remove('is-open'); document.body.style.overflow = ''; errorEl.textContent = ''; form.reset(); };
+  const updateGoalCount = () => {
+    if (goalCount && goalInput) {
+      goalCount.textContent = `${goalInput.value.length} / 160`;
+    }
+  };
+
+  const updateLength = (value) => {
+    const days = Math.min(365, Math.max(3, Number(value)));
+    lengthInput.value = days;
+    lengthOutput.textContent = `${days} day${days === 1 ? '' : 's'}`;
+
+    const progress = ((days - 3) / (365 - 3)) * 100;
+    lengthInput.style.setProperty(
+      '--range-progress',
+      `${progress}%`,
+    );
+
+    document.querySelectorAll('[data-plan-preset]').forEach((button) => {
+      button.classList.toggle(
+        'is-active',
+        Number(button.dataset.planPreset) === days,
+      );
+    });
+  };
+
+  const updateReminderRows = () => {
+    document.querySelectorAll('[data-reminder-row]').forEach((row) => {
+      const toggle = row.querySelector('[data-reminder-toggle]');
+      const timeInput = row.querySelector('[data-reminder-time]');
+
+      if (!toggle || !timeInput) return;
+
+      timeInput.disabled = !toggle.checked;
+      row.classList.toggle('is-selected', toggle.checked);
+    });
+  };
+
+  const open = () => {
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    updateGoalCount();
+    updateLength(lengthInput.value);
+    updateReminderRows();
+  };
+
+  const close = () => {
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    errorEl.textContent = '';
+    form.reset();
+
+    if (identityInput) identityInput.value = '';
+
+    updateGoalCount();
+    updateLength(30);
+    updateReminderRows();
+  };
 
   openBtn?.addEventListener('click', open);
   closeBtn?.addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) close();
+  });
+
+  goalInput?.addEventListener('input', updateGoalCount);
+  lengthInput?.addEventListener('input', () => {
+    updateLength(lengthInput.value);
+  });
+
+  document.querySelectorAll('[data-plan-preset]').forEach((button) => {
+    button.addEventListener('click', () => {
+      updateLength(button.dataset.planPreset);
+    });
+  });
+
+  document.querySelectorAll('[data-reminder-row]').forEach((row) => {
+    row.addEventListener('change', updateReminderRows);
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
     errorEl.textContent = '';
+
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
 
+    const reminderTimes = [...document.querySelectorAll('[data-reminder-row]')]
+      .filter((row) => row.querySelector('[data-reminder-toggle]')?.checked)
+      .map((row) => row.querySelector('[data-reminder-time]')?.value)
+      .filter(Boolean);
+
+    let reminderTimezone = 'UTC';
+
+    try {
+      reminderTimezone =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    } catch {
+      reminderTimezone = 'UTC';
+    }
+
     try {
       await api.post('/plans/custom', {
-        goal_text: document.getElementById('custom-goal').value.trim(),
-        direction: form.querySelector('input[name="custom-direction"]:checked').value,
-        length_days: parseInt(document.getElementById('custom-length').value, 10),
+        goal_text: goalInput.value.trim(),
+        direction: form.querySelector(
+          'input[name="custom-direction"]:checked',
+        ).value,
+        length_days: Number(lengthInput.value),
+        identity_statement: identityInput.value.trim(),
+        support_style: form.querySelector(
+          'input[name="custom-support-style"]:checked',
+        ).value,
+        reminder_times: reminderTimes,
+        reminder_timezone: reminderTimezone,
       });
+
       close();
       window.location.reload();
     } catch (err) {
-      errorEl.textContent = err.message === 'invalid_goal_text'
-        ? 'Please describe your goal in a few words (3–160 characters).'
-        : "Couldn't create that plan — try again.";
+      const messages = {
+        invalid_goal_text:
+          'Describe your goal in 3–160 characters.',
+        invalid_length_days:
+          'Choose a plan period between 3 and 365 days.',
+        invalid_identity_statement:
+          'Your identity statement must be 160 characters or fewer.',
+        invalid_support_style:
+          'Choose one of the available support styles.',
+        invalid_reminder_times:
+          'Choose up to three valid reminder times.',
+        invalid_timezone:
+          'We could not read your timezone. Please try again.',
+      };
+
+      errorEl.textContent =
+        messages[err.message] ||
+        "Couldn't create that plan — please try again.";
     } finally {
       submitBtn.disabled = false;
     }
   });
-}
 
-function initSquadNudges() {
-  document.querySelectorAll('[data-nudge]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      try {
-        // No real squad_id wired yet (squad join/membership flow is a
-        // follow-up feature) — this is left as a clearly-labeled no-op
-        // rather than silently pretending to succeed.
-        alert('Squad membership is coming soon — nudges will work once you can join a squad.');
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  });
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const user = await requireAuth();
-  if (!user) return; // requireAuth() already redirected
-
-  const slot = document.getElementById('nav-auth-slot');
-  if (slot) {
-    slot.innerHTML = `
-      <a href="profile.html" class="liquid-glass btn btn--glass">${escapeHtml(user.display_name)}</a>
-      <button class="btn btn--text" id="logout-btn" type="button">Logout</button>
-    `;
-    document.getElementById('logout-btn')?.addEventListener('click', logout);
+  if (new URLSearchParams(window.location.search).get('custom') === '1') {
+    open();
   }
-
-  let bloomScene = null;
-  try {
-    const canvas = document.getElementById('bloom-canvas');
-    bloomScene = new BloomScene(canvas);
-    bloomScene.start();
-    window.addEventListener('pagehide', () => bloomScene.destroy());
-  } catch (e) {
-    console.error('[bloom scene init failed]', e);
-  }
-
-  await loadPlans(bloomScene);
-  initCheckinDelegation(bloomScene);
-  initCustomPlanModal();
-  initSquadNudges();
-});
+}

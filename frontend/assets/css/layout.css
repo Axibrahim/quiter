@@ -1708,3 +1708,29 @@ main,
   align-items: center;
   gap: 1.25rem;
 }
+
+/* =========================================================================
+   FLEXIBLE CUSTOM PLAN BUILDER
+   ========================================================================= */
+
+.custom-plan-modal {
+  max-width: 560px;
+  max-height: min(860px, calc(100vh - 2rem));
+  overflow-y: auto;
+}
+
+.custom-plan__eyebrow {
+  margin-bottom: 0.5rem;
+  color: var(--accent-violet);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.custom-plan__intro {
+  max-width: 46ch;
+  margin: -0.75rem 0 var(--space-3);
+  color: var(--ink-50);
+  font-size: 0.88rem;
+  line-height: 1.55;
+} **…**

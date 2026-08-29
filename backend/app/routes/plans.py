@@ -8,7 +8,8 @@ the WHERE clause always includes user_id, enforced at the query layer, not
 just "checked after the fact").
 """
 from datetime import date
-
+import re
+from zoneinfo import ZoneInfo
 from flask import Blueprint, request, jsonify, g
 
 from app.models.models import db, PlanTemplate, PlanDay, UserPlan, DailyLog, LogStatus, gen_uuid
@@ -17,6 +18,87 @@ from app.security.limiter import limiter, HABIT_LOG_RATE_LIMIT
 from app.utils.validation import validate_uuid_param
 
 plans_bp = Blueprint("plans", __name__, url_prefix="/api/v1/plans")
+
+REMINDER_TIME_RE = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
+SUPPORT_STYLES = {"gentle", "focused", "reflective"}
+
+
+def _read_custom_settings(payload):
+    """
+    Validate flexible custom-plan settings.
+
+    Returns:
+        ((length_days, identity_statement, support_style,
+          reminder_times, reminder_timezone), None)
+        or
+        (None, error_code)
+    """
+    length_days = payload.get("length_days")
+
+    if (
+        not isinstance(length_days, int)
+        or isinstance(length_days, bool)
+        or not 3 <= length_days <= 365
+    ):
+        return None, "invalid_length_days"
+
+    identity_statement = payload.get("identity_statement") or ""
+    if not isinstance(identity_statement, str):
+        return None, "invalid_identity_statement"
+
+    identity_statement = identity_statement.strip()
+    if len(identity_statement) > 160:
+        return None, "invalid_identity_statement"
+
+    support_style = payload.get("support_style") or "gentle"
+    if support_style not in SUPPORT_STYLES:
+        return None, "invalid_support_style"
+
+    raw_times = payload.get("reminder_times", [])
+    if raw_times is None:
+        raw_times = []
+
+    if not isinstance(raw_times, list) or len(raw_times) > 3:
+        return None, "invalid_reminder_times"
+
+    normalized_times = []
+    for reminder_time in raw_times:
+        if (
+            not isinstance(reminder_time, str)
+            or not REMINDER_TIME_RE.fullmatch(reminder_time)
+        ):
+            return None, "invalid_reminder_times"
+
+        if reminder_time not in normalized_times:
+            normalized_times.append(reminder_time)
+
+    normalized_times.sort(
+        key=lambda value: int(value[:2]) * 60 + int(value[3:])
+    )
+
+    reminder_timezone = payload.get("reminder_timezone") or "UTC"
+
+    if (
+        not isinstance(reminder_timezone, str)
+        or len(reminder_timezone) > 64
+    ):
+        return None, "invalid_timezone"
+
+    try:
+        ZoneInfo(reminder_timezone)
+    except Exception:
+        return None, "invalid_timezone"
+
+    return (
+        (
+            length_days,
+            identity_statement,
+            support_style,
+            normalized_times,
+            reminder_timezone,
+        ),
+        None,
+    )
 
 
 @plans_bp.route("/mine", methods=["GET"])
@@ -40,6 +122,14 @@ def my_plans():
             "day_number": day_number,
             "total_days": up.template.length_days,
             "current_streak": up.current_streak,
+            "goal_text": up.goal_text or up.template.title,
+            "identity_statement": (
+                up.identity_statement or up.template.identity_statement
+            ),
+            "support_style": up.support_style,
+            "reminder_times": up.reminder_times or [],
+            "reminder_timezone": up.reminder_timezone,
+            "reminders_enabled": up.reminders_enabled,
             "longest_streak": up.longest_streak,
             "is_completed": up.is_completed,
             "is_abandoned": up.is_abandoned,
@@ -202,60 +292,120 @@ def checkin(user_plan_id):
         "reward_tier": plan_day.reward_tier if (plan_day and status_raw == LogStatus.COMPLETED.value) else 0,
     }), 200
 
-
 @plans_bp.route("/custom", methods=["POST"])
 @login_required
 def create_custom_plan():
-    """Lets a registered user build their own plan instead of picking from
-    the catalog. Deliberately reuses the existing PlanTemplate/PlanDay
-    schema rather than adding new tables or columns — it creates a
-    template scoped to this moment (is_active=False so it never appears in
-    the public /templates browse list), generates one PlanDay per day with
-    a micro-goal derived from the user's own goal text, then immediately
-    adopts it into a UserPlan, exactly like picking a catalog plan would.
+    """
+    Create a flexible user-owned plan.
+
+    The generated PlanTemplate remains hidden from the public catalog,
+    while UserPlan stores the user's personal goal, support preferences,
+    reminder schedule, and timezone.
     """
     payload = request.get_json(silent=True) or {}
-    goal_text = (payload.get("goal_text") or "").strip()
-    direction = payload.get("direction")
-    length_days = payload.get("length_days")
 
-    if not (3 <= len(goal_text) <= 160):
+    goal_text = payload.get("goal_text") or ""
+    if not isinstance(goal_text, str):
         return jsonify({"error": "invalid_goal_text"}), 400
+
+    goal_text = goal_text.strip()
+    if not 3 <= len(goal_text) <= 160:
+        return jsonify({"error": "invalid_goal_text"}), 400
+
+    direction = payload.get("direction")
     if direction not in ("break", "build"):
         return jsonify({"error": "invalid_direction"}), 400
-    if length_days not in (7, 15, 30):
-        return jsonify({"error": "invalid_length_days"}), 400
+
+    settings, error = _read_custom_settings(payload)
+    if error:
+        return jsonify({"error": error}), 400
+
+    (
+        length_days,
+        identity_statement,
+        support_style,
+        reminder_times,
+        reminder_timezone,
+    ) = settings
+
+    if not identity_statement:
+        identity_statement = (
+            "I am someone who is "
+            + (
+                "breaking free from "
+                if direction == "break"
+                else "building "
+            )
+            + goal_text
+            + "."
+        )
+
+    if support_style == "gentle":
+        daily_action = (
+            f"Take one small, kind step toward — {goal_text}."
+        )
+    elif support_style == "focused":
+        daily_action = (
+            f"Complete one clear action toward — {goal_text}."
+        )
+    else:
+        daily_action = (
+            f"Pause, notice what you need, and take one step toward — "
+            f"{goal_text}."
+        )
 
     template = PlanTemplate(
         slug=f"custom-{gen_uuid()[:8]}",
         title=goal_text[:120],
-        identity_statement=f"I am someone who is {('breaking free from' if direction == 'break' else 'building')} {goal_text}.",
+        identity_statement=identity_statement,
         direction=direction,
         category="custom",
         length_days=length_days,
-        description="A custom plan built by the user.",
-        is_active=False,  # hidden from the public catalog — personal to this plan instance
+        description="A flexible custom plan built by the user.",
+        is_active=False,
     )
+
     db.session.add(template)
-    db.session.flush()  # assigns template.id without committing yet
+    db.session.flush()
 
     for day_number in range(1, length_days + 1):
-        db.session.add(PlanDay(
-            template_id=template.id,
-            day_number=day_number,
-            micro_goal=f"Day {day_number}: take one small, concrete step toward — {goal_text}.",
-            identity_cue=template.identity_statement,
-            reward_tier=1,
-        ))
+        db.session.add(
+            PlanDay(
+                template_id=template.id,
+                day_number=day_number,
+                micro_goal=f"Day {day_number}: {daily_action}",
+                identity_cue=identity_statement,
+                reward_tier=1,
+            )
+        )
 
-    user_plan = UserPlan(user_id=g.current_user.id, template_id=template.id, start_date=date.today())
+    user_plan = UserPlan(
+        user_id=g.current_user.id,
+        template_id=template.id,
+        goal_text=goal_text,
+        identity_statement=identity_statement,
+        support_style=support_style,
+        reminder_times=reminder_times,
+        reminder_timezone=reminder_timezone,
+        reminders_enabled=bool(reminder_times),
+        start_date=date.today(),
+    )
+
     db.session.add(user_plan)
     db.session.commit()
 
-    return jsonify({
-        "user_plan_id": user_plan.id,
-        "template_id": template.id,
-        "title": template.title,
-        "length_days": length_days,
-        "start_date": user_plan.start_date.isoformat(),
-    }), 201
+    return jsonify(
+        {
+            "user_plan_id": user_plan.id,
+            "template_id": template.id,
+            "title": template.title,
+            "goal_text": goal_text,
+            "identity_statement": identity_statement,
+            "support_style": support_style,
+            "length_days": length_days,
+            "reminder_times": reminder_times,
+            "reminder_timezone": reminder_timezone,
+            "reminders_enabled": bool(reminder_times),
+            "start_date": user_plan.start_date.isoformat(),
+        }
+    ), 201

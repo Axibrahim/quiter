@@ -9,7 +9,6 @@
  * - Liquid-glass hover interactions
  * - WebGL bloom reward
  * - Habit tracking API calls
- * - Squad nudges
  * - Plan interactions
  * - Authentication modal & nav state
  *
@@ -221,7 +220,7 @@ function initGlassHover() {
   if (prefersReducedMotion || !hasFinePointer) return;
 
   const glassCards = document.querySelectorAll(`
-    .plan-card, .service-card, .step-card, .bento-cell, .squad-panel, .philosophy__visual, .plan-card--custom
+    .plan-card, .service-card, .step-card, .bento-cell, .philosophy__visual, .plan-card--custom
   `);
 
   glassCards.forEach((card) => {
@@ -331,31 +330,6 @@ function initHabitTracking(bloomScene) {
   document.getElementById('checkin-missed')?.addEventListener('click', () => submitCheckin('missed'));
 }
 
-
-/* =========================================================================
-   9. SQUAD NUDGES
-   ========================================================================= */
-
-function initSquadNudges() {
-  const activeSquadId = document.body.dataset.activeSquadId || null;
-
-  document.querySelectorAll('[data-nudge]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      if (!activeSquadId) return;
-      const type = btn.dataset.nudge;
-      btn.disabled = true;
-
-      try {
-        await api.post(`/squads/${activeSquadId}/nudge`, { type });
-        announce(type === 'relapse_shield' ? 'Relapse Shield sent to your squad.' : 'Nudge sent.');
-      } catch (err) {
-        announce(`Couldn't send that — ${err.message}.`);
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  });
-}
 
 
 /* =========================================================================
@@ -653,13 +627,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[habit tracking init failed]', e);
   }
 
-  /* Squad nudges */
-  try {
-    initSquadNudges();
-  } catch (e) {
-    console.error('[squad nudges init failed]', e);
-  }
-
   /* Plan card flip */
   try {
     initPlanCardFlip();
@@ -688,3 +655,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[auth init failed]', e);
   }
 });
+

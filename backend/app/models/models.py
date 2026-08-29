@@ -62,18 +62,6 @@ class LogStatus(str, enum.Enum):
     PARTIAL = "partial"
 
 
-class NudgeType(str, enum.Enum):
-    STAY_STRONG = "stay_strong"
-    BREATHE = "breathe"
-    PROUD_OF_YOU = "proud_of_you"
-    RELAPSE_SHIELD = "relapse_shield"   # urgent real-time craving alert
-
-
-class SquadRole(str, enum.Enum):
-    MEMBER = "member"
-    MODERATOR = "moderator"
-
-
 # ---------------------------------------------------------------------------
 # USERS
 # ---------------------------------------------------------------------------
@@ -113,9 +101,6 @@ class User(db.Model):
 
     plans = relationship("UserPlan", back_populates="user", cascade="all, delete-orphan")
     logs = relationship("DailyLog", back_populates="user", cascade="all, delete-orphan")
-    squad_memberships = relationship("SquadMember", back_populates="user", cascade="all, delete-orphan")
-    nudges_sent = relationship("Nudge", foreign_keys="Nudge.sender_id", back_populates="sender")
-    nudges_received = relationship("Nudge", foreign_keys="Nudge.recipient_id", back_populates="recipient")
 
     @validates("email")
     def _normalize_email(self, key, value):
@@ -154,7 +139,10 @@ class PlanTemplate(db.Model):
                          order_by="PlanDay.day_number")
 
     __table_args__ = (
-        CheckConstraint("length_days IN (7, 15, 30)", name="ck_plan_length_valid"),
+        CheckConstraint(
+            "length_days BETWEEN 3 AND 365",
+            name="ck_plan_length_valid",
+),
     )
 
 
@@ -166,7 +154,7 @@ class PlanDay(db.Model):
     template_id = Column(UUID(as_uuid=False), ForeignKey("plan_templates.id", ondelete="CASCADE"), nullable=False)
 
     day_number = Column(Integer, nullable=False)
-    micro_goal = Column(String(200), nullable=False)          # "Drink 500ml water before your first coffee."
+    micro_goal = Column(String(280), nullable=False)          # "Drink 500ml water before your first coffee."
     identity_cue = Column(String(200), nullable=True)         # "Athletes hydrate before they caffeinate."
     reward_tier = Column(Integer, nullable=False, default=1)  # drives which Three.js bloom stage fires
 
@@ -187,6 +175,15 @@ class UserPlan(db.Model):
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     template_id = Column(UUID(as_uuid=False), ForeignKey("plan_templates.id", ondelete="RESTRICT"), nullable=False)
+    # Custom-plan settings. Catalog plans may leave these nullable/defaulted.
+    goal_text = Column(String(160), nullable=True)
+    identity_statement = Column(String(160), nullable=True)
+    support_style = Column(String(20), nullable=False, default="gentle")
+
+    # Stored as JSONB so each user can choose zero, one, two, or three times.
+    reminder_times = Column(JSONB, nullable=False, default=list)
+    reminder_timezone = Column(String(64), nullable=False, default="UTC")
+    reminders_enabled = Column(Boolean, nullable=False, default=False)
 
     start_date = Column(Date, nullable=False, default=date.today)
     current_streak = Column(Integer, nullable=False, default=0)
@@ -235,67 +232,3 @@ class DailyLog(db.Model):
         Index("ix_daily_logs_user_date", "user_id", "log_date"),
     )
 
-
-# ---------------------------------------------------------------------------
-# SQUADS (anonymous 10–20 person accountability groups)
-# ---------------------------------------------------------------------------
-
-class Squad(db.Model):
-    __tablename__ = "squads"
-
-    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
-    name = Column(String(80), nullable=False)             # e.g. "Sober Sprinters #14"
-    category = Column(String(60), nullable=False)         # matches PlanTemplate.category
-    max_members = Column(Integer, nullable=False, default=20)
-    invite_code = Column(String(12), unique=True, nullable=False, index=True)
-
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-
-    members = relationship("SquadMember", back_populates="squad", cascade="all, delete-orphan")
-
-    __table_args__ = (
-        CheckConstraint("max_members BETWEEN 10 AND 20", name="ck_squad_size_bounds"),
-    )
-
-
-class SquadMember(db.Model):
-    __tablename__ = "squad_members"
-
-    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
-    squad_id = Column(UUID(as_uuid=False), ForeignKey("squads.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-
-    role = Column(Enum(SquadRole, name="squad_role"), nullable=False, default=SquadRole.MEMBER)
-    consistency_score = Column(Integer, nullable=False, default=0)   # denormalized leaderboard cache
-    joined_at = Column(DateTime, nullable=False, server_default=func.now())
-
-    squad = relationship("Squad", back_populates="members")
-    user = relationship("User", back_populates="squad_memberships")
-
-    __table_args__ = (
-        UniqueConstraint("squad_id", "user_id", name="uq_squad_membership_unique"),
-        Index("ix_squad_leaderboard", "squad_id", "consistency_score"),
-    )
-
-
-class Nudge(db.Model):
-    """1-click peer support signals, including the urgent Relapse Shield
-    alert. Delivered over the realtime channel (see routes/realtime.py) and
-    persisted here for the activity feed / abuse auditing."""
-    __tablename__ = "nudges"
-
-    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
-    squad_id = Column(UUID(as_uuid=False), ForeignKey("squads.id", ondelete="CASCADE"), nullable=False, index=True)
-    sender_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    recipient_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=True)  # null = broadcast to squad
-
-    type = Column(Enum(NudgeType, name="nudge_type"), nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    acknowledged_at = Column(DateTime, nullable=True)
-
-    sender = relationship("User", foreign_keys=[sender_id], back_populates="nudges_sent")
-    recipient = relationship("User", foreign_keys=[recipient_id], back_populates="nudges_received")
-
-    __table_args__ = (
-        Index("ix_nudges_squad_recent", "squad_id", "created_at"),
-    )

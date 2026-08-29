@@ -162,6 +162,16 @@ mask-composite: exclude;
   background: rgba(255, 255, 255, 0.035);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+  /* Ambient elevation shadow — lifts the panel off the page so it reads
+     as a distinct surface even on a plain black section with nothing
+     behind it. Layered: a large soft ambient shadow for depth, a tighter
+     contact shadow for edge definition, plus the original wet-glass
+     inset highlight preserved on top. */
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 20px 55px rgba(0, 0, 0, 0.45);
 }
 
 /* --- Buttons --- */
