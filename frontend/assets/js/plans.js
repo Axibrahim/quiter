@@ -70,6 +70,10 @@ function getCategoryGlow(direction) {
   return direction === 'break' ? 'rgba(255,107,74,0.35)' : 'rgba(63,232,201,0.35)';
 }
 
+function getPlanPhoto(template) {
+  return `assets/media/plans/${template.slug || template.id}.jpg`;
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -105,6 +109,130 @@ function renderPlanCard(template) {
 
   card.querySelector('[data-adopt-btn]')?.addEventListener('click', () => handleAdopt(template));
   return card;
+}
+
+
+function renderHeroSlide(template) {
+  const glow = template.glow || getCategoryGlow(template.direction);
+  const directionText = template.direction === 'break' ? 'Break' : 'Build';
+  const categoryText = template.category ? `${directionText} · ${template.category.charAt(0).toUpperCase() + template.category.slice(1)}` : directionText;
+
+  const slide = document.createElement('div');
+  slide.className = 'plans-swiper__slide';
+  slide.dataset.slug = template.slug || '';
+
+  slide.innerHTML = `
+    <div class="plans-swiper__photo-wrap" style="--plan-glow: ${glow};">
+      <img class="plans-swiper__photo" src="${template.photo_url || getPlanPhoto(template)}" alt="" loading="lazy" />
+      <div class="plans-swiper__glyph" aria-hidden="true">${template.glyph || getCategoryGlyph(template.category, template.direction)}</div>
+    </div>
+    <div class="plans-swiper__scrim"></div>
+    <div class="plans-swiper__info">
+      <span class="plan-card__direction plan-card__direction--${template.direction}">${escapeHtml(categoryText)}</span>
+      <h2 class="plans-swiper__title">${escapeHtml(template.title)}</h2>
+      <p class="plans-swiper__identity">"${escapeHtml(template.identity_statement)}"</p>
+      <div class="plan-card__meta" style="justify-content: flex-start; gap: 1.25rem;">
+        <span>${template.length_days} days</span>
+        <span>${template.active_count || 'Active now'}</span>
+        ${template.price_cents != null ? `<span>$${(template.price_cents / 100).toFixed(2)}</span>` : ''}
+        ${template.trial_days ? `<span>${template.trial_days}-day free trial</span>` : ''}
+      </div>
+      <button class="liquid-glass btn btn--solid plans-swiper__choose" data-adopt-btn type="button">Choose this plan</button>
+    </div>
+  `;
+
+  slide.querySelector('.plans-swiper__photo')
+    ?.addEventListener('error', () => slide.classList.add('plans-swiper__slide--noimg'), { once: true });
+
+  slide.querySelector('[data-adopt-btn]')?.addEventListener('click', () => handleAdopt(template));
+  return slide;
+}
+
+function renderHeroSwiper() {
+  const track = document.getElementById('plans-swiper-track');
+  const dotsWrap = document.getElementById('plans-swiper-dots');
+  if (!track) return;
+
+  track.innerHTML = '';
+  if (dotsWrap) dotsWrap.innerHTML = '';
+
+  if (allTemplates.length === 0) {
+    track.innerHTML = '<p style="color: var(--ink-40); padding: 2rem;">No plans available yet.</p>';
+    return;
+  }
+
+  allTemplates.forEach((t, i) => {
+    track.appendChild(renderHeroSlide(t));
+    if (dotsWrap) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'plans-swiper__dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('aria-label', `Go to ${t.title}`);
+      dot.addEventListener('click', () => {
+        track.children[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      dotsWrap.appendChild(dot);
+    }
+  });
+
+  initSwiperInteractions();
+}
+
+function initSwiperInteractions() {
+  const track = document.getElementById('plans-swiper-track');
+  const prevBtn = document.getElementById('swiper-prev');
+  const nextBtn = document.getElementById('swiper-next');
+  if (!track) return;
+
+  const scrollByOne = (dir) => {
+    const slide = track.querySelector('.plans-swiper__slide');
+    if (!slide) return;
+    const amount = slide.getBoundingClientRect().width + 16;
+    track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+  };
+
+  prevBtn?.addEventListener('click', () => scrollByOne(-1));
+  nextBtn?.addEventListener('click', () => scrollByOne(1));
+
+  // Click-and-drag support for mouse/trackpad — touch already swipes natively
+  let isDown = false;
+  let startX = 0;
+  let scrollStart = 0;
+
+  track.addEventListener('pointerdown', (e) => {
+    isDown = true;
+    track.classList.add('is-dragging');
+    startX = e.clientX;
+    scrollStart = track.scrollLeft;
+    track.setPointerCapture(e.pointerId);
+  });
+
+  track.addEventListener('pointermove', (e) => {
+    if (!isDown) return;
+    track.scrollLeft = scrollStart - (e.clientX - startX);
+  });
+
+  const endDrag = () => {
+    isDown = false;
+    track.classList.remove('is-dragging');
+  };
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointerleave', endDrag);
+
+  // Keep the active dot in sync while swiping
+  const dots = document.querySelectorAll('.plans-swiper__dot');
+  if (dots.length) {
+    const slides = [...track.querySelectorAll('.plans-swiper__slide')];
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = slides.indexOf(entry.target);
+          dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+        }
+      });
+    }, { root: track, threshold: 0.6 });
+    slides.forEach((s) => observer.observe(s));
+  }
 }
 
 function renderCustomPlanCard() {
@@ -158,6 +286,7 @@ async function loadCatalog() {
   } finally {
     if (loading) loading.style.display = 'none';
     applyFilters();
+    renderHeroswiper();
   }
 }
 
@@ -347,34 +476,7 @@ function initSmoothScroll() {
   return lenis;
 }
 
-function initPlansBloomScrollEffect() {
-  const photo = document.getElementById('plans-bloom-photo');
-  if (!photo) return;
 
-  let raf = null;
-
-  const update = () => {
-    raf = null;
-    const scrollY = window.scrollY || window.pageYOffset;
-    const progress = Math.min(1, Math.max(0, scrollY / (window.innerHeight * 0.75)));
-    const blur = progress * 20;
-    const scale = progress;
-    const parallax = scrollY * 0.25;
-
-    photo.style.setProperty('--plans-blur', `${blur}px`);
-    photo.style.setProperty('--plans-scale', scale);
-    photo.style.setProperty('--plans-parallax', `${parallax}px`);
-  };
-
-  const onScroll = () => {
-    if (raf) return;
-    raf = requestAnimationFrame(update);
-  };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('touchmove', onScroll, { passive: true });
-  update();
-}
 
 /* =========================================================================
    BOOT
@@ -385,12 +487,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSmoothScroll();
   } catch (e) {
     console.error('[smooth scroll failed]', e);
-  }
-
-  try {
-    initPlansBloomScrollEffect();
-  } catch (e) {
-    console.error('[bloom scroll effect failed]', e);
   }
 
   await initAuthState();

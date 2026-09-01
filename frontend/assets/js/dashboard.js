@@ -248,3 +248,25 @@ function initCustomPlanModal() {
     open();
   }
 }
+
+function initBloomScene() {
+  const canvas = document.getElementById('bloom-canvas');
+  if (!canvas) return null;
+
+  const scene = new BloomScene(canvas);
+  scene.start();
+  window.addEventListener('pagehide', () => scene.destroy());
+  return scene;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = await requireAuth();
+  if (!user) return;
+
+  const bloomScene = initBloomScene();
+
+  initCheckinDelegation(bloomScene);
+  initCustomPlanModal();
+
+  await loadPlans(bloomScene);
+});

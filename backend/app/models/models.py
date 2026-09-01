@@ -82,6 +82,7 @@ class User(db.Model):
 
     is_active = Column(Boolean, nullable=False, default=True)
     is_verified = Column(Boolean, nullable=False, default=False)
+    is_admin = Column(Boolean, nullable=False, default=False)
 
     # Email verification (sent via Resend on registration).
     verification_token = Column(String(64), nullable=True, index=True)
@@ -131,6 +132,9 @@ class PlanTemplate(db.Model):
     length_days = Column(Integer, nullable=False)
 
     description = Column(Text, nullable=True)
+    photo_url = Column(String(500), nullable=True)
+    price_cents = Column(Integer, nullable=True)
+    trial_days = Column(Integer, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())

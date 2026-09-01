@@ -32,6 +32,7 @@ def _public_user(user: User) -> dict:
         "email": user.email,
         "display_name": user.display_name,
         "is_verified": user.is_verified,
+        "is_admin": user.is_admin,
     }
 
 

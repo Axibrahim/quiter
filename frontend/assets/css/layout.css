@@ -1974,3 +1974,231 @@ main,
   height: 1.15rem;
   accent-color: var(--accent-teal, #3fe8c9);
 }
+
+/* =========================================================================
+   PLANS HERO PHOTO SWIPER — full-bleed, Netflix-style, one slide per view
+   ========================================================================= */
+
+.plans-hero-swiper {
+  position: relative;
+  width: 100%;
+  height: 88vh;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.plans-hero-swiper .nav {
+  position: relative;
+  z-index: 20;
+  padding: var(--space-3, 1rem) clamp(1.25rem, 4vw, 3rem);
+}
+
+.plans-swiper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.plans-swiper__track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  cursor: grab;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.plans-swiper__track::-webkit-scrollbar {
+  display: none;
+}
+
+.plans-swiper__track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.plans-swiper__slide {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.plans-swiper__photo-wrap {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 65% 35%, var(--plan-glow, rgba(141, 124, 255, 0.35)), transparent 65%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.plans-swiper__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.plans-swiper__glyph {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 7rem;
+}
+
+.plans-swiper__slide--noimg .plans-swiper__glyph {
+  display: flex;
+}
+
+.plans-swiper__slide--noimg .plans-swiper__photo {
+  display: none;
+}
+
+.plans-swiper__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.75) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 65%);
+  pointer-events: none;
+}
+
+.plans-swiper__info {
+  position: absolute;
+  left: 0;
+  bottom: 12%;
+  max-width: 46ch;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  color: #fff;
+}
+
+.plans-swiper__title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.plans-swiper__identity {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.plans-swiper__choose {
+  margin-top: 0.5rem;
+  width: fit-content;
+  padding-inline: 2rem;
+}
+
+.plans-swiper__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 18, 29, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 15;
+}
+
+.plans-swiper__arrow--prev { left: clamp(0.5rem, 2.5vw, 1.75rem); }
+.plans-swiper__arrow--next { right: clamp(0.5rem, 2.5vw, 1.75rem); }
+
+.plans-swiper__dots {
+  position: absolute;
+  right: clamp(1.5rem, 6vw, 4rem);
+  bottom: 6%;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 15;
+}
+
+.plans-swiper__dot {
+  width: 2rem;
+  height: 0.3rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 200ms ease;
+}
+
+.plans-swiper__dot.is-active {
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .plans-hero-swiper { height: 78vh; }
+  .plans-swiper__arrow { display: none; }
+  .plans-swiper__info { max-width: 80vw; bottom: 16%; }
+}
+
+/* =========================================================================
+   MOTIVATION SECTION
+   ========================================================================= */
+
+.motivation {
+  padding-block: var(--space-6, 4rem);
+  text-align: center;
+}
+
+.motivation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.motivation-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.motivation-card__quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--ink-70);
+}
+
+/* =========================================================================
+   CUSTOM PLAN FORM — GROUPED, BORDERED SECTIONS
+   ========================================================================= */
+
+.custom-plan__group {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.custom-plan__group:last-of-type {
+  margin-bottom: var(--space-2);
+}
+
+.custom-plan__group-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-violet);
+  margin-bottom: var(--space-2);
+}

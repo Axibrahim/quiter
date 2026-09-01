@@ -168,6 +168,9 @@ def list_templates():
         "category": t.category,
         "length_days": t.length_days,
         "description": t.description,
+        "photo_url": t.photo_url,
+        "price_cents": t.price_cents,
+        "trial_days": t.trial_days,
     } for t in templates]), 200
 
 

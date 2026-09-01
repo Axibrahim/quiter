@@ -28,3 +28,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[about scroll animations failed]', e);
   }
 });
+
+function initAboutBloomScrollEffect() {
+  const photo = document.getElementById('about-bloom-photo');
+  if (!photo) return;
+
+  let raf = null;
+
+  const update = () => {
+    raf = null;
+    const scrollY = window.scrollY || window.pageYOffset;
+    const progress = Math.min(1, Math.max(0, scrollY / (window.innerHeight * 0.75)));
+    photo.style.setProperty('--plans-blur', `${progress * 20}px`);
+    photo.style.setProperty('--plans-scale', progress);
+    photo.style.setProperty('--plans-parallax', `${scrollY * 0.25}px`);
+  };
+
+  const onScroll = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('touchmove', onScroll, { passive: true });
+  update();
+}

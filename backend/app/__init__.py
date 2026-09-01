@@ -18,6 +18,7 @@ from app.security.headers import init_security_headers
 from app.security.limiter import limiter
 from app.routes.auth import auth_bp
 from app.routes.plans import plans_bp
+from app.routes.admin import admin_bp
 
 def create_app(config_name: str = "production") -> Flask:
     app = Flask(__name__)
@@ -91,6 +92,7 @@ def create_app(config_name: str = "production") -> Flask:
     # --- Blueprints ------------------------------------------------------
     app.register_blueprint(auth_bp)
     app.register_blueprint(plans_bp)
+    app.register_blueprint(admin_bp)
     
     # --- Global error handlers -------------------------------------------
     # Deliberately generic messages on 500 — a stack trace or DB error string

@@ -41,10 +41,11 @@ function applyNavState() {
       navLinks.appendChild(dashLink);
     }
 
-    // Keep only the User Profile pill in the right slot
+    // Keep only the User Profile pill (plus Admin, if applicable) in the right slot
     slot.innerHTML = `
+      ${currentUser.is_admin ? '<a href="admin.html" class="liquid-glass btn btn--glass">Admin</a>' : ''}
       <a href="profile.html" class="liquid-glass btn btn--glass user-pill">${escapeHtml(currentUser.display_name)}</a>
-    `;
+      `;
   } else {
     // Remove Dashboard link if logged out
     document.getElementById('nav-dashboard-link')?.remove();
