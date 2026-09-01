@@ -1733,4 +1733,244 @@ main,
   color: var(--ink-50);
   font-size: 0.88rem;
   line-height: 1.55;
-} **…**
+}
+
+/* =========================================================================
+   MOBILE NAVIGATION DROPDOWN
+   ========================================================================= */
+
+.nav__pill {
+  position: relative;
+}
+
+.nav__mobile-panel {
+  display: contents;
+}
+
+.nav__menu-toggle {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: var(--ink-70);
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.nav__menu-toggle:hover,
+.nav__menu-toggle[aria-expanded="true"] {
+  border-color: var(--accent-violet);
+  background: rgba(141, 124, 255, 0.14);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.nav__menu-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+@media (max-width: 760px) {
+  .nav {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .nav__pill {
+    min-height: 3.5rem;
+    padding: 0.5rem 0.65rem 0.5rem 0.9rem;
+    border-radius: 1.25rem;
+  }
+
+  .nav__left {
+    min-width: 0;
+    gap: 0;
+  }
+
+  .nav__mark {
+    font-size: 1rem;
+  }
+
+  .nav__mobile-panel {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    right: 0;
+    left: 0;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.25rem;
+    background: rgba(20, 18, 29, 0.88);
+    box-shadow:
+      0 20px 55px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+  }
+
+  .nav__mobile-panel.is-open {
+    display: flex;
+    animation: mobile-nav-in 180ms ease both;
+  }
+
+  .nav__links {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    width: 100%;
+    font-size: 0.92rem;
+  }
+
+  .nav__links a {
+    display: block;
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.75rem;
+    color: var(--ink-70);
+    transition:
+      color 180ms ease,
+      background 180ms ease;
+  }
+
+  .nav__links a:hover,
+  .nav__links a.is-active {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--ink);
+    opacity: 1;
+  }
+
+  .nav__right {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    gap: 0.5rem;
+    width: 100%;
+    padding-top: 0.7rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  .nav__right .btn {
+    flex: 1;
+    min-width: 7rem;
+  }
+
+  .nav__menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+  }
+}
+
+@keyframes mobile-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__mobile-panel.is-open {
+    animation: none;
+  }
+}
+
+/* =========================================================================
+   CUSTOM PLAN — SWIPEABLE DAY PICKER
+   ========================================================================= */
+
+.day-picker {
+  position: relative;
+  border-radius: var(--radius-md, 20px);
+  overflow: hidden;
+}
+
+.day-picker__track {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.75rem 50%;
+  scrollbar-width: none;
+}
+.day-picker__track::-webkit-scrollbar { display: none; }
+
+.day-picker__chip {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-40);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition:
+    transform 250ms var(--ease-out),
+    color 250ms ease,
+    background 250ms ease,
+    border-color 250ms ease;
+}
+
+.day-picker__chip.is-active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.15);
+}
+
+.day-picker__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3rem;
+  pointer-events: none;
+  z-index: 2;
+}
+.day-picker__fade--left { left: 0; background: linear-gradient(90deg, rgba(10,10,12,0.9), transparent); }
+.day-picker__fade--right { right: 0; background: linear-gradient(270deg, rgba(10,10,12,0.9), transparent); }
+
+.day-picker__value {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-top: 0.6rem;
+}
+
+#reminder-options {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: var(--space-2, 1rem);
+  padding-top: var(--space-2, 1rem);
+}
+
+.modal__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+.modal__checkbox-row input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--accent-teal, #3fe8c9);
+}

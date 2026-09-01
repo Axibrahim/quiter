@@ -85,3 +85,18 @@ def send_password_reset_email(email: str, display_name: str, token: str) -> None
     </div>
     """
     _send(email, "Reset your Quiter password", html)
+
+def send_reminder_email(email: str, display_name: str, goal_title: str, identity_statement: str, personal_note: str | None = None) -> None:
+    note_html = f'<p style="color:#555;font-style:italic;">"{personal_note}"</p>' if personal_note else ""
+    html = f"""
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>{display_name}, today's the day.</h2>
+      <p style="font-size:15px;">{identity_statement}</p>
+      {note_html}
+      <p><a href="{_APP_BASE_URL}/dashboard.html" style="display:inline-block;padding:12px 24px;background:#000;color:#fff;
+        border-radius:999px;text-decoration:none;">Check in on {goal_title}</a></p>
+      <p style="color:#888;font-size:13px;">You're getting this because you turned on daily reminders for this plan.
+        You can turn them off anytime from your dashboard.</p>
+    </div>
+    """
+    _send(email, f"Reminder: {goal_title}", html)
