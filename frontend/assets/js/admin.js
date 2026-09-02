@@ -27,8 +27,12 @@ function fieldsFromForm() {
       ? Number(document.getElementById('tpl-trial').value)
       : null,
     is_active: document.getElementById('tpl-active').checked,
+    tagline: document.getElementById('tpl-tagline').value.trim() || null,
+    cta_text: document.getElementById('tpl-cta').value.trim() || null,
+    age_rating: document.getElementById('tpl-age-rating').value.trim() || null,
+    is_included: document.getElementById('tpl-included').checked,
   };
-}
+    };
 
 function fillForm(template) {
   document.getElementById('tpl-title').value = template.title || '';
@@ -41,6 +45,10 @@ function fillForm(template) {
   document.getElementById('tpl-price').value = template.price_cents != null ? (template.price_cents / 100).toFixed(2) : '';
   document.getElementById('tpl-trial').value = template.trial_days != null ? template.trial_days : '';
   document.getElementById('tpl-active').checked = template.is_active !== false;
+  document.getElementById('tpl-tagline').value = template.tagline || '';
+  document.getElementById('tpl-cta').value = template.cta_text || '';
+  document.getElementById('tpl-age-rating').value = template.age_rating || '';
+  document.getElementById('tpl-included').checked = template.is_included !== false;
 
   uploadedPhotoUrl = template.photo_url || '';
   const preview = document.getElementById('tpl-photo-preview');

@@ -110,13 +110,41 @@
             <label for="tpl-trial">Free trial (days) <span class="custom-plan__optional">Optional</span></label>
             <input id="tpl-trial" type="number" min="0" max="90" placeholder="e.g. 7" />
           </div>
-
-          <div class="modal__field">
+          
+        <div class="modal__field">
             <label class="custom-plan__reminder-label" style="width: fit-content;">
               <input type="checkbox" id="tpl-active" checked />
               <span>Active (visible in the public catalog)</span>
             </label>
+            </div>
+        </div>
+
+        <div class="liquid-glass custom-plan__group">
+          <p class="custom-plan__group-label">Hero swiper content</p>
+          <p class="custom-plan__hint">These show on the big swiping banner at the top of the Plans page.</p>
+
+          <div class="modal__field">
+            <label for="tpl-tagline">Tagline <span class="custom-plan__optional">Optional — e.g. "THE FIST. THE FREEDOM."</span></label>
+            <input id="tpl-tagline" type="text" maxlength="120" />
           </div>
+
+          <div class="modal__field">
+            <label for="tpl-cta">CTA button text <span class="custom-plan__optional">Defaults to "Start Your Journey"</span></label>
+            <input id="tpl-cta" type="text" maxlength="40" placeholder="Start Your Journey" />
+          </div>
+
+          <div class="modal__field">
+            <label for="tpl-age-rating">Age rating <span class="custom-plan__optional">Optional — e.g. "18+"</span></label>
+            <input id="tpl-age-rating" type="text" maxlength="10" placeholder="18+" />
+          </div>
+
+          <div class="modal__field">
+            <label class="custom-plan__reminder-label" style="width: fit-content;">
+              <input type="checkbox" id="tpl-included" checked />
+              <span>Show "Included with Quiter" badge</span>
+            </label>
+          </div>
+        </div>
         </div>
 
         <p class="modal__error" id="tpl-error"></p>

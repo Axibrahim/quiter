@@ -114,8 +114,8 @@ function renderPlanCard(template) {
 
 function renderHeroSlide(template) {
   const glow = template.glow || getCategoryGlow(template.direction);
-  const directionText = template.direction === 'break' ? 'Break' : 'Build';
-  const categoryText = template.category ? `${directionText} · ${template.category.charAt(0).toUpperCase() + template.category.slice(1)}` : directionText;
+  const ctaText = template.cta_text || 'Start Your Journey';
+  const bodyText = template.description || template.identity_statement;
 
   const slide = document.createElement('div');
   slide.className = 'plans-swiper__slide';
@@ -127,17 +127,20 @@ function renderHeroSlide(template) {
       <div class="plans-swiper__glyph" aria-hidden="true">${template.glyph || getCategoryGlyph(template.category, template.direction)}</div>
     </div>
     <div class="plans-swiper__scrim"></div>
+
+    ${template.age_rating ? `<span class="plans-swiper__age-badge">${escapeHtml(template.age_rating)}</span>` : ''}
+
     <div class="plans-swiper__info">
-      <span class="plan-card__direction plan-card__direction--${template.direction}">${escapeHtml(categoryText)}</span>
+      ${template.tagline ? `<p class="plans-swiper__tagline">${escapeHtml(template.tagline)}</p>` : ''}
       <h2 class="plans-swiper__title">${escapeHtml(template.title)}</h2>
-      <p class="plans-swiper__identity">"${escapeHtml(template.identity_statement)}"</p>
-      <div class="plan-card__meta" style="justify-content: flex-start; gap: 1.25rem;">
-        <span>${template.length_days} days</span>
-        <span>${template.active_count || 'Active now'}</span>
-        ${template.price_cents != null ? `<span>$${(template.price_cents / 100).toFixed(2)}</span>` : ''}
-        ${template.trial_days ? `<span>${template.trial_days}-day free trial</span>` : ''}
-      </div>
-      <button class="liquid-glass btn btn--solid plans-swiper__choose" data-adopt-btn type="button">Choose this plan</button>
+      ${bodyText ? `<p class="plans-swiper__desc">${escapeHtml(bodyText)}</p>` : ''}
+      <button class="liquid-glass btn btn--solid plans-swiper__choose" data-adopt-btn type="button">${escapeHtml(ctaText)}</button>
+      ${template.is_included !== false ? `
+        <span class="plans-swiper__included">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Included with Quiter
+        </span>
+      ` : ''}
     </div>
   `;
 
@@ -219,18 +222,19 @@ function initSwiperInteractions() {
   track.addEventListener('pointerup', endDrag);
   track.addEventListener('pointerleave', endDrag);
 
-  // Keep the active dot in sync while swiping
+    // Keep the active dot AND the focused slide in sync while swiping
   const dots = document.querySelectorAll('.plans-swiper__dot');
-  if (dots.length) {
-    const slides = [...track.querySelectorAll('.plans-swiper__slide')];
+  const slides = [...track.querySelectorAll('.plans-swiper__slide')];
+  if (slides.length) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+        entry.target.classList.toggle('is-active', entry.isIntersecting && entry.intersectionRatio > 0.6);
+        if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
           const idx = slides.indexOf(entry.target);
           dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
         }
       });
-    }, { root: track, threshold: 0.6 });
+    }, { root: track, threshold: [0, 0.6, 1] });
     slides.forEach((s) => observer.observe(s));
   }
 }

@@ -31,6 +31,10 @@ def _serialize_template(t):
         "photo_url": t.photo_url,
         "price_cents": t.price_cents,
         "trial_days": t.trial_days,
+        "tagline": t.tagline,
+        "cta_text": t.cta_text,
+        "age_rating": t.age_rating,
+        "is_included": t.is_included,
         "is_active": t.is_active,
     }
 
@@ -101,6 +105,36 @@ def _read_template_payload(payload, partial=False):
             if not isinstance(trial_days, int) or isinstance(trial_days, bool) or not 0 <= trial_days <= 90:
                 return None, "invalid_trial_days"
         fields["trial_days"] = trial_days
+
+    if "tagline" in payload:
+        tagline = payload.get("tagline")
+        if tagline is not None:
+            if not isinstance(tagline, str) or len(tagline) > 120:
+                return None, "invalid_tagline"
+            tagline = tagline.strip() or None
+        fields["tagline"] = tagline
+
+    if "cta_text" in payload:
+        cta_text = payload.get("cta_text")
+        if cta_text is not None:
+            if not isinstance(cta_text, str) or len(cta_text) > 40:
+                return None, "invalid_cta_text"
+            cta_text = cta_text.strip() or None
+        fields["cta_text"] = cta_text
+
+    if "age_rating" in payload:
+        age_rating = payload.get("age_rating")
+        if age_rating is not None:
+            if not isinstance(age_rating, str) or len(age_rating) > 10:
+                return None, "invalid_age_rating"
+            age_rating = age_rating.strip() or None
+        fields["age_rating"] = age_rating
+
+    if "is_included" in payload:
+        is_included = payload.get("is_included")
+        if not isinstance(is_included, bool):
+            return None, "invalid_is_included"
+        fields["is_included"] = is_included
 
     if "is_active" in payload:
         is_active = payload.get("is_active")

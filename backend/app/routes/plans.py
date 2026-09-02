@@ -171,6 +171,10 @@ def list_templates():
         "photo_url": t.photo_url,
         "price_cents": t.price_cents,
         "trial_days": t.trial_days,
+        "tagline": t.tagline,
+        "cta_text": t.cta_text,
+        "age_rating": t.age_rating,
+        "is_included": t.is_included,
     } for t in templates]), 200
 
 

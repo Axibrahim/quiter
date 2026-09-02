@@ -135,6 +135,10 @@ class PlanTemplate(db.Model):
     photo_url = Column(String(500), nullable=True)
     price_cents = Column(Integer, nullable=True)
     trial_days = Column(Integer, nullable=True)
+    tagline = Column(String(120), nullable=True)
+    cta_text = Column(String(40), nullable=True)
+    age_rating = Column(String(10), nullable=True)
+    is_included = Column(Boolean, nullable=False, default=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())
